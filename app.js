@@ -898,10 +898,12 @@
   };
   // Far = slowest + smallest; near = fastest + biggest.
   const speeds = { far: 0.05, mid: 0.30, near: 0.55 };
+  // depthWeights: cumulative thresholds for d1/d2/d3 — far layer is flat,
+  // near layer has the most "tall" blocks (deep stacked shadow).
   const pixelLayerConfig = {
-    far:  { count: 80, sizeMin: 2,   sizeMax: 3.5 },
-    mid:  { count: 80, sizeMin: 3.5, sizeMax: 5.5 },
-    near: { count: 80, sizeMin: 5,   sizeMax: 8.5 }
+    far:  { count: 80, sizeMin: 2,   sizeMax: 3.5, depthWeights: [0.80, 0.98, 1.00] },
+    mid:  { count: 80, sizeMin: 3.5, sizeMax: 5.5, depthWeights: [0.45, 0.85, 1.00] },
+    near: { count: 80, sizeMin: 5,   sizeMax: 8.5, depthWeights: [0.20, 0.65, 1.00] }
   };
   // Dark palette — subtle variation between near-black tones.
   const pixelPalette = ['#000000', '#0E0B07', '#18130C', '#221A11', '#2A1E13'];
@@ -917,8 +919,15 @@
     };
   }
 
-  function spawnPixelLayer(layerEl, count, sizeMin, sizeMax, seed) {
+  function pickDepthClass(rand, weights) {
+    if (rand < weights[0]) return 'bg-pixel--d1';
+    if (rand < weights[1]) return 'bg-pixel--d2';
+    return 'bg-pixel--d3';
+  }
+
+  function spawnPixelLayer(layerEl, cfg, seed) {
     if (!layerEl) return;
+    const { count, sizeMin, sizeMax, depthWeights } = cfg;
     const rng = makeRng(seed);
     let html = '';
     for (let i = 0; i < count; i++) {
@@ -926,9 +935,10 @@
       const y = rng() * 100;
       const s = sizeMin + rng() * (sizeMax - sizeMin);
       const c = pixelPalette[Math.floor(rng() * pixelPalette.length)];
-      const o = 0.30 + rng() * 0.45;
+      const o = 0.55 + rng() * 0.35;
+      const depthCls = pickDepthClass(rng(), depthWeights);
       html +=
-        `<span class="bg-pixel" style="` +
+        `<span class="bg-pixel ${depthCls}" style="` +
         `--x:${x.toFixed(2)}%;` +
         `--y:${y.toFixed(2)}%;` +
         `--s:${s.toFixed(1)}px;` +
@@ -940,9 +950,9 @@
   }
 
   // Different seed per layer so scatters don't align.
-  spawnPixelLayer(layers.far,  pixelLayerConfig.far.count,  pixelLayerConfig.far.sizeMin,  pixelLayerConfig.far.sizeMax,  101);
-  spawnPixelLayer(layers.mid,  pixelLayerConfig.mid.count,  pixelLayerConfig.mid.sizeMin,  pixelLayerConfig.mid.sizeMax,  202);
-  spawnPixelLayer(layers.near, pixelLayerConfig.near.count, pixelLayerConfig.near.sizeMin, pixelLayerConfig.near.sizeMax, 303);
+  spawnPixelLayer(layers.far,  pixelLayerConfig.far,  101);
+  spawnPixelLayer(layers.mid,  pixelLayerConfig.mid,  202);
+  spawnPixelLayer(layers.near, pixelLayerConfig.near, 303);
 
   let parallaxFrame = null;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
