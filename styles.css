@@ -321,7 +321,8 @@ input { font: inherit; color: inherit; }
 }
 .island-slot--side .island-label {
   font-size: 9px;
-  padding: 0;
+  padding: 3px 8px;
+  border-radius: 10px;
   bottom: -4px;
 }
 /* Empty-side placeholder — small rounded chip with stacked shadow.
@@ -469,7 +470,7 @@ input { font: inherit; color: inherit; }
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
 }
 
-/* Island label — plain text, no bubble */
+/* Island label */
 .island-label {
   position: absolute;
   left: 50%;
@@ -479,10 +480,11 @@ input { font: inherit; color: inherit; }
   font-weight: 600;
   line-height: 1.2;
   color: var(--text-primary);
-  background: none;
-  padding: 0;
-  border: 0;
-  box-shadow: none;
+  background: rgba(255, 247, 230, 0.92);
+  padding: 4px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 2px 6px rgba(24, 19, 12, 0.08);
   width: max-content;
   max-width: 90%;
   text-align: center;
