@@ -1,0 +1,812 @@
+/* ============================================================
+   Mission Map — Prototype styles
+   Mobile-first, max 430px centered. Warm Sqills palette.
+   ============================================================ */
+
+/* ---------- Tokens ---------- */
+:root {
+  /* Surfaces */
+  --canvas:         #F2EEE3;
+  --surface:        #FFFFFF;
+  --surface-subtle: #ECE6D6;
+  --surface-muted:  #E5DDC8;
+  --header-bg:      #FFFFFF;
+
+  /* Text */
+  --text-primary:   #18130C;
+  --text-body:      #3C342A;
+  --text-secondary: #6F6557;
+  --text-tertiary:  #98907F;
+  --text-inverse:   #FFF6E5;
+
+  /* Brand / amber ramp */
+  --primary-500:    #FF7A1A;
+  --primary-600:    #E65F00;
+  --primary-700:    #B94800;
+  --amber-light:    #FFC54D;
+  --amber-mid:      #FFA42A;
+  --amber-deep:     #FF7A1A;
+  --amber-bloom:    rgba(255, 122, 26, 0.35);
+
+  /* Borders & shadows */
+  --border-subtle:  rgba(24, 19, 12, 0.08);
+  --border-default: rgba(24, 19, 12, 0.16);
+  --shadow-stack:   0 2px 0 0 var(--surface-muted), 0 4px 8px rgba(40, 32, 22, 0.06);
+  --shadow-stack-pressed: 0 1px 0 0 var(--surface-muted);
+  --shadow-cta:     0 3px 0 0 var(--primary-700), 0 6px 16px rgba(255, 122, 26, 0.32);
+  --shadow-elev-md: 0 8px 24px rgba(24, 19, 12, 0.10), 0 2px 6px rgba(24, 19, 12, 0.06);
+
+  /* Sky / clouds */
+  --sky-top:        #F2EEE3;
+  --sky-mid:        #F2EEE3;
+  --sky-bottom:     #F2EEE3;
+  --cloud:          #FFF7E6;
+
+  /* Layout */
+  --max-width:      430px;
+  --pad-x:          16px;
+  --header-h:       148px; /* identity band 6 + pill row 64 + progress 22 + tabs 56 */
+  --island-pitch:   230px; /* vertical distance between island centers */
+  --island-size:    190px;
+}
+
+/* ---------- Reset ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  width: 100%;
+  min-height: 100%;
+  background: var(--canvas);          /* same as body — no side strips of any colour */
+}
+body {
+  /* App fills the entire viewport — width of screen IS width of app. */
+  width: 100%;
+  margin: 0;
+  position: relative;
+  min-height: 100dvh;
+  /* iOS 26+ safe-area: push content below the notch / Dynamic Island. */
+  padding-top: env(safe-area-inset-top);
+  background: var(--canvas);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+img { display: block; max-width: 100%; }
+ol, ul { list-style: none; }
+input { font: inherit; color: inherit; }
+
+/* ---------- Identity band (sits inside the app frame, not over viewport) ---------- */
+.identity-band {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: linear-gradient(90deg,
+    #2A1E13 0%, #553420 22%, #8C512B 44%,
+    #C9763C 66%, #F4A45A 84%, #FFD191 100%);
+  z-index: 20;
+}
+
+/* ---------- Header ---------- */
+.app-header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background: var(--header-bg);
+  /* Extend header bg up into the iOS safe-area-inset-top zone so the notch
+     area is filled with header chrome (white) instead of revealing scrolled-
+     past map content during over-scroll bounces. */
+  padding: calc(6px + env(safe-area-inset-top)) var(--pad-x) 0;
+  margin-top: calc(-1 * env(safe-area-inset-top));
+  z-index: 15;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0 12px;
+}
+.plan-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  box-shadow: var(--shadow-stack);
+  transition: transform 90ms ease, box-shadow 90ms ease;
+}
+.plan-pill:active {
+  transform: translateY(1px);
+  box-shadow: var(--shadow-stack-pressed);
+}
+.plan-pill__title { white-space: nowrap; }
+.plan-pill__chevron { flex: 0 0 16px; color: var(--text-secondary); }
+
+.avatar {
+  flex: 0 0 44px;
+  height: 44px;
+  width: 44px;
+  border-radius: 50%;
+  background: var(--primary-600);
+  color: var(--text-inverse);
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-stack);
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+}
+.progress__track {
+  flex: 1;
+  height: 8px;
+  background: var(--surface-subtle);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress__fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg,
+    var(--amber-light) 0%, var(--amber-mid) 50%, var(--amber-deep) 100%);
+  border-radius: 999px;
+  box-shadow: 0 0 8px rgba(255, 122, 26, 0.45);
+  transition: width 260ms cubic-bezier(.2,.7,.2,1);
+}
+.progress__counter {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 38px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding-bottom: 4px;
+}
+.tab {
+  flex: 1;
+  padding: 12px 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+  border-bottom: 2px solid transparent;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+.tab[aria-selected="true"] {
+  color: var(--text-primary);
+  border-color: var(--primary-500);
+}
+
+/* ---------- Tab panels ---------- */
+.tab-panel {
+  width: 100%;
+  flex: 1;
+  position: relative;
+}
+.tab-panel[hidden] { display: none; }
+
+/* ---------- Map tab ---------- */
+.tab-panel--map { padding-bottom: 80px; }
+
+.parallax {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+/* .sky is now just background — body already paints --canvas across the frame.
+   Kept as a noop in case other rules reference it. */
+.sky { display: none; }
+.cloud-defs { position: absolute; }
+.cloud-layer {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 100%;
+  will-change: transform;
+}
+.cloud {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w, 220px);
+  height: auto;
+  display: block;
+  /* --tx may include scaleX(-1) flip + slight rotation for chaos. */
+  transform: translateX(-50%) var(--tx, scale(1));
+  pointer-events: none;
+  image-rendering: pixelated;       /* preserve pixel-edges of the asset */
+  image-rendering: -webkit-optimize-contrast;
+}
+/* Per-cloud opacity comes from inline `--o` (random 0.40-0.70).
+   Slight desaturation + brightness lift gives a whiter / cleaner cloud feel
+   while preserving the watercolor texture. */
+.cloud {
+  opacity: var(--o, 0.55);
+  filter: saturate(0.55) brightness(1.10);
+}
+
+.map {
+  position: relative;
+  z-index: 1;
+  padding-top: 0;
+  min-height: 100dvh;
+}
+.trail {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+/* Trail dots — rounded rectangles, rotated to lie along the curve tangent. */
+.trail-dot {
+  position: absolute;
+  width: 12px;
+  height: 6px;
+  border-radius: 2px;
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  pointer-events: none;
+}
+.trail-dot--solid {
+  background: var(--primary-500);
+  box-shadow:
+    0 2px 0 0 var(--primary-700),
+    0 5px 10px rgba(229, 95, 0, 0.40);
+}
+.trail-dot--dashed {
+  background: #B89770;
+  box-shadow:
+    0 2px 0 0 #8A6A45,
+    0 5px 10px rgba(140, 100, 60, 0.30);
+  opacity: 0.92;
+}
+
+.islands {
+  position: relative;
+  z-index: 2;
+  list-style: none;
+}
+.island-slot {
+  position: absolute;
+  width: var(--island-size);
+  transform: translateX(-50%);
+}
+/* Last mission — centered horizontally + 30% bigger. */
+.island-slot--last {
+  width: calc(var(--island-size) * 1.62);
+}
+.island-slot--last .island {
+  width: calc(var(--island-size) * 1.62);
+  height: calc(var(--island-size) * 1.62);
+}
+.island {
+  position: relative;
+  display: block;
+  width: var(--island-size);
+  height: var(--island-size);
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: transform 150ms cubic-bezier(.2,.7,.2,1),
+              filter 200ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.island img,
+.island .island-placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  transition: filter 200ms ease;
+}
+.island-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #FFC58A, #C76A1F 70%);
+  color: var(--text-inverse);
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  box-shadow: 0 14px 24px rgba(176, 80, 8, 0.32);
+}
+
+/* State filters */
+.island.state-done img,
+.island.state-done .island-placeholder {
+  /* Slightly grey, less saturated — read as "уже пройдено". */
+  filter: saturate(0.45) brightness(0.92) contrast(0.95);
+}
+.island.state-current img,
+.island.state-current .island-placeholder {
+  /* Stronger amber bloom — three stacked drop-shadows for soft glow halo. */
+  filter:
+    drop-shadow(0 0 28px rgba(255, 168, 60, 0.85))
+    drop-shadow(0 0 14px rgba(255, 122, 26, 0.60))
+    drop-shadow(0 8px 18px rgba(255, 122, 26, 0.34));
+}
+.island.state-current { transform: scale(1.07); }
+.island.state-available img,
+.island.state-available .island-placeholder {
+  filter: none;
+}
+.island.state-locked img,
+.island.state-locked .island-placeholder {
+  /* Locked — colour preserved but muted; reads dimmer than active but not grey. */
+  filter: grayscale(0.30) brightness(0.78) saturate(0.65) contrast(0.96);
+}
+
+/* Press feedback — must be visible BEFORE navigation */
+.island.pressed { transform: scale(0.92); }
+.island.state-current.pressed { transform: scale(1.0); }
+.island.pressed img,
+.island.pressed .island-placeholder {
+  filter: brightness(1.08) saturate(1.05);
+}
+
+/* Locked shake */
+.island.shake { animation: shake 320ms cubic-bezier(.36,.07,.19,.97); }
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(3px); }
+  30%, 50%, 70% { transform: translateX(-5px); }
+  40%, 60% { transform: translateX(5px); }
+}
+
+/* Done check badge */
+.island-badge--done {
+  position: absolute;
+  right: -4px;
+  bottom: -2px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #2DB46B;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(45, 180, 107, 0.40), 0 0 0 3px var(--canvas);
+  z-index: 3;
+}
+.island-badge--done svg { width: 18px; height: 18px; }
+
+/* Lock overlay */
+.island-badge--locked {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 3;
+}
+.island-badge--locked svg {
+  width: 38px;
+  height: 38px;
+  color: rgba(255, 255, 255, 0.92);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+}
+
+/* Island label */
+.island-label {
+  position: absolute;
+  left: 50%;
+  bottom: -32px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: rgba(255, 247, 230, 0.92);
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 2px 6px rgba(24, 19, 12, 0.08);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Empty state */
+.empty-state {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 80px 24px;
+  color: var(--text-secondary);
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.empty-state[hidden] { display: none; }
+.empty-state h2 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 24px;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+.empty-state p { font-size: 15px; }
+.link-to-editor {
+  color: var(--primary-600);
+  font-weight: 600;
+  border-bottom: 1px dashed var(--primary-500);
+  padding: 0;
+}
+
+/* ---------- Editor tab ---------- */
+.editor {
+  padding: 20px var(--pad-x) 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dropzone {
+  display: block;
+  border: 2px dashed var(--border-default);
+  border-radius: 16px;
+  padding: 28px 20px;
+  background: var(--surface);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+.dropzone:hover { background: var(--surface-subtle); }
+.dropzone.drag-over {
+  border-color: var(--primary-500);
+  background: rgba(255, 122, 26, 0.06);
+  transform: translateY(-1px);
+}
+.dropzone__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+}
+.dropzone__inner svg { color: var(--primary-500); }
+.dropzone__inner strong {
+  font-size: 16px;
+  color: var(--text-primary);
+  margin-top: 6px;
+}
+.dropzone__inner span { font-size: 13px; }
+
+.mission-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mission-row {
+  display: grid;
+  grid-template-columns: 28px 56px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  box-shadow: 0 1px 0 rgba(24, 19, 12, 0.04);
+  transition: background 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+}
+.mission-row.dragging {
+  opacity: 0.4;
+}
+.mission-row.drop-target-above {
+  box-shadow: 0 -3px 0 var(--primary-500), 0 1px 0 rgba(24, 19, 12, 0.04);
+}
+.mission-row.drop-target-below {
+  box-shadow: 0 3px 0 var(--primary-500), 0 1px 0 rgba(24, 19, 12, 0.04);
+}
+
+.mission-drag {
+  cursor: grab;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  touch-action: none;
+}
+.mission-drag:active { cursor: grabbing; }
+.mission-drag svg { width: 18px; height: 18px; }
+
+.mission-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--surface-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.mission-thumb img { width: 100%; height: 100%; object-fit: contain; }
+.mission-thumb__placeholder {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  color: var(--primary-600);
+}
+
+.mission-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.mission-fields input,
+.mission-fields select {
+  font-size: 14px;
+  padding: 6px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--canvas);
+  color: var(--text-primary);
+  width: 100%;
+  min-width: 0;
+}
+.mission-fields input:focus,
+.mission-fields select:focus {
+  outline: 2px solid var(--primary-500);
+  outline-offset: -1px;
+  border-color: transparent;
+}
+.mission-fields__row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.mission-fields__row label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.mission-fields__row .lessons-completed,
+.mission-fields__row .lessons-total {
+  width: 56px;
+  text-align: center;
+}
+.mission-fields__row .lessons-sep {
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+
+.mission-delete {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  transition: background 140ms ease, color 140ms ease;
+}
+.mission-delete:hover {
+  background: rgba(220, 53, 53, 0.10);
+  color: #C53030;
+}
+.mission-delete svg { width: 16px; height: 16px; }
+
+.editor-actions {
+  display: flex;
+  justify-content: center;
+  padding-top: 12px;
+}
+.btn-ghost {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: color 140ms ease, background 140ms ease;
+}
+.btn-ghost:hover {
+  color: #C53030;
+  background: rgba(220, 53, 53, 0.06);
+}
+
+.editor-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .progress__fill,
+  .island,
+  .island-ring__fill,
+  .mission-row,
+  .tab {
+    transition: none;
+  }
+  .island.shake { animation: none; }
+}
+
+/* ---------- Desktop frame: lock the app to 9:16, centre it, white sides ---------- */
+@media (min-width: 460px) {
+  html { background: #FFFFFF; }       /* sides outside the frame */
+  body {
+    width: min(100vw, calc(100dvh * 9 / 16), var(--max-width));
+    margin: 0 auto;
+  }
+}
+
+/* ---------- Mission preview overlay ---------- */
+.preview {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: previewFadeIn 320ms ease-out;
+}
+.preview[hidden] { display: none; }
+.preview__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(24, 19, 12, 0.14);
+  backdrop-filter: blur(12px) saturate(0.92);
+  -webkit-backdrop-filter: blur(12px) saturate(0.92);
+  animation: backdropBlurIn 420ms cubic-bezier(.2,.7,.2,1);
+}
+/* Decorative clouds inside the overlay — sit above the blur, below the panel. */
+.preview__clouds {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.preview__clouds img {
+  position: absolute;
+  width: var(--w, 120px);
+  height: auto;
+  left: var(--x, 0);
+  top: var(--y, 0);
+  opacity: var(--o, 0.55);
+  filter: saturate(0.55) brightness(1.10);
+  image-rendering: pixelated;
+  transform: var(--tx, scale(1));
+}
+.preview__panel {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  width: 100%;
+  max-width: 360px;
+  animation: previewPop 320ms cubic-bezier(.2,.7,.2,1);
+}
+.preview__title {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.15;
+  color: var(--text-primary);
+  text-align: center;
+  letter-spacing: -0.01em;
+  padding: 0 16px;
+}
+.preview__image-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px 0;
+}
+.preview__image {
+  width: min(72vw, 300px);
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 18px 30px rgba(140, 100, 50, 0.25));
+}
+/* CTA — wide rectangular Button/Primary per DS reference. */
+.preview__cta {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 24px;
+  background: var(--primary-500);
+  color: var(--text-inverse);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 0.01em;
+  border-radius: 16px;
+  box-shadow:
+    0 5px 0 0 var(--primary-700),
+    0 10px 26px rgba(255, 122, 26, 0.34);
+  transition: transform 90ms ease, box-shadow 90ms ease;
+}
+.preview__cta:active {
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 0 var(--primary-700),
+    0 3px 10px rgba(255, 122, 26, 0.28);
+}
+.preview__dismiss {
+  position: absolute;
+  top: -54px;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(24, 19, 12, 0.18);
+}
+.preview__dismiss svg { width: 16px; height: 16px; }
+
+@keyframes previewFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes previewPop {
+  from { transform: scale(0.78); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+@keyframes backdropBlurIn {
+  from {
+    backdrop-filter: blur(0) saturate(1);
+    -webkit-backdrop-filter: blur(0) saturate(1);
+    background: rgba(24, 19, 12, 0);
+  }
+  to {
+    backdrop-filter: blur(12px) saturate(0.92);
+    -webkit-backdrop-filter: blur(12px) saturate(0.92);
+    background: rgba(24, 19, 12, 0.14);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview, .preview__panel, .preview__backdrop { animation: none; }
+}
