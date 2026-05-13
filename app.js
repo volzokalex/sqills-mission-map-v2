@@ -300,14 +300,7 @@
       const y = islandY(i);
       const isLast = i === count - 1;
 
-      const badge = m.state === 'done'
-        ? `<span class="island-badge--done" aria-hidden="true">
-             <svg viewBox="0 0 24 24" fill="none">
-               <path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="3"
-                     stroke-linecap="round" stroke-linejoin="round"/>
-             </svg>
-           </span>`
-        : m.state === 'locked'
+      const badge = m.state === 'locked'
         ? `<span class="island-badge--locked" aria-hidden="true">
              <svg viewBox="0 0 24 24" fill="currentColor">
                <path d="M6 10V8a6 6 0 0 1 12 0v2h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h1zm2 0h8V8a4 4 0 0 0-8 0v2z"/>
