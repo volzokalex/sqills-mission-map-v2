@@ -479,9 +479,9 @@ input { font: inherit; color: inherit; }
   line-height: 1.2;
   letter-spacing: 0.01em;
   color: var(--text-inverse);
-  background: linear-gradient(180deg, #FFA042 0%, var(--primary-500) 100%);
+  background: var(--amber-mid);
   padding: 7px 14px;
-  border-radius: 999px;
+  border-radius: 12px;
   border: 0;
   box-shadow:
     0 3px 0 0 var(--primary-700),
