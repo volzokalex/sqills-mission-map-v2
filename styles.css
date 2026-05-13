@@ -6,7 +6,7 @@
 /* ---------- Tokens ---------- */
 :root {
   /* Surfaces */
-  --canvas:         #F2EEE3;
+  --canvas:         #FAF8F3;
   --surface:        #FFFFFF;
   --surface-subtle: #ECE6D6;
   --surface-muted:  #E5DDC8;
@@ -37,9 +37,9 @@
   --shadow-elev-md: 0 8px 24px rgba(24, 19, 12, 0.10), 0 2px 6px rgba(24, 19, 12, 0.06);
 
   /* Sky / clouds */
-  --sky-top:        #F2EEE3;
-  --sky-mid:        #F2EEE3;
-  --sky-bottom:     #F2EEE3;
+  --sky-top:        #FAF8F3;
+  --sky-mid:        #FAF8F3;
+  --sky-bottom:     #FAF8F3;
   --cloud:          #FFF7E6;
 
   /* Layout */
@@ -320,9 +320,8 @@ input { font: inherit; color: inherit; }
   height: calc(var(--island-size) * 0.45);
 }
 .island-slot--side .island-label {
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: 10px;
+  font-size: 9px;
+  padding: 0;
   bottom: -4px;
 }
 /* Empty-side placeholder — small rounded chip with stacked shadow.
@@ -470,25 +469,24 @@ input { font: inherit; color: inherit; }
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
 }
 
-/* Island label */
+/* Island label — plain text, no bubble */
 .island-label {
   position: absolute;
   left: 50%;
-  bottom: -8px;                     /* sits right under the island art */
+  bottom: -8px;
   transform: translateX(-50%);
   font-size: 13px;
   font-weight: 600;
   line-height: 1.2;
   color: var(--text-primary);
-  background: rgba(255, 247, 230, 0.92);
-  padding: 4px 12px;
-  border-radius: 12px;              /* not pill: rounded rect wraps cleaner */
-  border: 1px solid var(--border-subtle);
-  box-shadow: 0 2px 6px rgba(24, 19, 12, 0.08);
+  background: none;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
   width: max-content;
   max-width: 90%;
   text-align: center;
-  white-space: normal;              /* wrap long titles instead of truncating */
+  white-space: normal;
 }
 
 /* Empty state */
