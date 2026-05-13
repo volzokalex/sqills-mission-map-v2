@@ -672,6 +672,20 @@
     renderHeader();
   });
 
+  // Export current roster as JSON — download a file with everything in
+  // localStorage so prod state can be copied back into the repo's sample-data.
+  document.getElementById('exportJson')?.addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(missions, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mission-map-export-${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+
   /* ---------- Persistence helper + cross-tab sync ---------- */
   function persist() { Store.save(missions); }
   window.addEventListener('storage', (e) => {
