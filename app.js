@@ -202,6 +202,16 @@
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     })[c]);
   }
+  // Deterministic 0..1 from a string + salt — used to scatter side missions
+  // chaotically but stably (same positions across re-renders / reloads).
+  function pseudoRand(str, salt) {
+    let h = salt >>> 0;
+    const s = String(str || '');
+    for (let i = 0; i < s.length; i++) {
+      h = Math.imul(h ^ s.charCodeAt(i), 2654435761) >>> 0;
+    }
+    return (h % 10000) / 10000;
+  }
   function curvedPath(x1pct, y1, x2pct, y2) {
     // x in %, y in px (SVG uses viewBox '0 0 100 mapH', preserveAspectRatio=none)
     const mx = (x1pct + x2pct) / 2;
@@ -331,15 +341,21 @@
         </li>
       `;
 
-      // Side missions for this main — placed as smaller islands offset L/R.
+      // Side missions for this main — placed as smaller islands offset L/R,
+      // with a chaotic but deterministic scatter on both axes per side id.
       const sides = Array.isArray(m.sides) ? m.sides : [];
       sides.forEach((s, sIdx) => {
         const stacksOnThisSide = sides.filter(x => x.side === s.side).indexOf(s);
-        const xOffPct = s.side === 'L' ? -34 : 34;
+        const rx = pseudoRand(s.id, 17);                           // 0..1
+        const ry = pseudoRand(s.id, 53);                           // 0..1
+        const xMagPct = 30 + rx * 12;                              // 30..42%
+        const xOffPct = (s.side === 'L' ? -1 : 1) * xMagPct;
         const sx = x + xOffPct;
-        // Stagger Y for multiple sides on the same side: +0, +44, +88 px.
-        const yStaggerPx = stacksOnThisSide * 44;
-        const sy = y + ISLAND_SIZE * 0.42 + yStaggerPx;
+        // Y scatter: roughly -0.18..+0.55 of ISLAND_SIZE around main top.
+        // Some sides float above the main, others hang below.
+        const yScatterFactor = -0.18 + ry * 0.73;
+        const yStaggerPx = stacksOnThisSide * 52;
+        const sy = y + ISLAND_SIZE * yScatterFactor + yStaggerPx;
         const sBadge = s.state === 'locked'
           ? `<span class="island-badge--locked" aria-hidden="true">
                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 10V8a6 6 0 0 1 12 0v2h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h1zm2 0h8V8a4 4 0 0 0-8 0v2z"/></svg>
