@@ -335,7 +335,7 @@
       const sides = Array.isArray(m.sides) ? m.sides : [];
       sides.forEach((s, sIdx) => {
         const stacksOnThisSide = sides.filter(x => x.side === s.side).indexOf(s);
-        const xOffPct = s.side === 'L' ? -28 : 28;
+        const xOffPct = s.side === 'L' ? -34 : 34;
         const sx = x + xOffPct;
         // Stagger Y for multiple sides on the same side: +0, +44, +88 px.
         const yStaggerPx = stacksOnThisSide * 44;
