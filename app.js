@@ -940,10 +940,10 @@
     layerEl.innerHTML = html;
   }
 
-  // Different seed per layer so scatters don't align.
-  spawnCloudLayer(layers.far,  cloudLayerConfig.far,  111);
-  spawnCloudLayer(layers.mid,  cloudLayerConfig.mid,  222);
-  spawnCloudLayer(layers.near, cloudLayerConfig.near, 333);
+  // Clouds disabled — re-enable by uncommenting the three calls.
+  // spawnCloudLayer(layers.far,  cloudLayerConfig.far,  111);
+  // spawnCloudLayer(layers.mid,  cloudLayerConfig.mid,  222);
+  // spawnCloudLayer(layers.near, cloudLayerConfig.near, 333);
 
   let parallaxFrame = null;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
