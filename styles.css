@@ -320,10 +320,7 @@ input { font: inherit; color: inherit; }
   height: calc(var(--island-size) * 0.45);
 }
 .island-slot--side .island-label {
-  font-size: 9px;
-  padding: 3px 8px;
-  border-radius: 10px;
-  bottom: -4px;
+  display: none;
 }
 /* Empty-side placeholder — small rounded chip with stacked shadow.
    Selector matches the specificity of the base `.island .island-placeholder`
