@@ -269,27 +269,21 @@ input { font: inherit; color: inherit; }
   z-index: 1;
   pointer-events: none;
 }
-/* Trail dots — rounded rectangles, rotated to lie along the curve tangent. */
+/* Trail "pixels" — flat light-orange squares along the curve. */
 .trail-dot {
   position: absolute;
-  width: 12px;
+  width: 6px;
   height: 6px;
-  border-radius: 2px;
-  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  border-radius: 0;
+  transform: translate(-50%, -50%);
   pointer-events: none;
 }
 .trail-dot--solid {
-  background: var(--primary-500);
-  box-shadow:
-    0 2px 0 0 var(--primary-700),
-    0 5px 10px rgba(229, 95, 0, 0.40);
+  background: #FFB870;
 }
 .trail-dot--dashed {
-  background: #B89770;
-  box-shadow:
-    0 2px 0 0 #8A6A45,
-    0 5px 10px rgba(140, 100, 60, 0.30);
-  opacity: 0.92;
+  background: #E6C9A6;
+  opacity: 0.85;
 }
 
 .islands {
@@ -339,21 +333,10 @@ input { font: inherit; color: inherit; }
   font-size: 16px;
   margin: auto;                        /* centre the chip inside the (larger) .island button */
 }
-/* Smaller trail cubes between main and side — 4×2 instead of 12×6. */
+/* Side trail pixels — same look, just smaller. */
 .trail-dot--side {
-  width: 4px;
-  height: 2px;
-  border-radius: 1px;
-}
-.trail-dot--side.trail-dot--solid {
-  box-shadow:
-    0 1px 0 0 var(--primary-700),
-    0 2px 4px rgba(229, 95, 0, 0.30);
-}
-.trail-dot--side.trail-dot--dashed {
-  box-shadow:
-    0 1px 0 0 #8A6A45,
-    0 2px 4px rgba(140, 100, 60, 0.22);
+  width: 3px;
+  height: 3px;
 }
 .island {
   position: relative;
