@@ -65,7 +65,8 @@ body {
   min-height: 100dvh;
   /* iOS 26+ safe-area: push content below the notch / Dynamic Island. */
   padding-top: env(safe-area-inset-top);
-  background: var(--canvas);
+  /* Soft halftone gradient: cream at top → warmer cream at bottom. */
+  background: linear-gradient(180deg, var(--canvas) 0%, #F0DEBE 100%);
   color: var(--text-primary);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-size: 16px;
@@ -265,10 +266,27 @@ input { font: inherit; color: inherit; }
     0 4px 7px rgba(24, 19, 12, 0.28),
     0 7px 14px rgba(24, 19, 12, 0.16);
 }
-/* Depth-of-field: far layer softest, near layer crispest. */
-.cloud-layer--far  { filter: blur(2.4px); }
-.cloud-layer--mid  { filter: blur(1.2px); }
-.cloud-layer--near { filter: blur(0.4px); }
+/* Halftone parallax washes — three soft warm spots drifting at different
+   speeds. Colours stay in the cream → muted-orange range so it reads as
+   atmosphere, not decoration. */
+.cloud-layer--far {
+  background:
+    radial-gradient(60% 40% at 22% 18%,
+      rgba(255, 178, 100, 0.20) 0%,
+      rgba(255, 178, 100, 0)    65%);
+}
+.cloud-layer--mid {
+  background:
+    radial-gradient(55% 35% at 78% 52%,
+      rgba(255, 158, 80, 0.18) 0%,
+      rgba(255, 158, 80, 0)    65%);
+}
+.cloud-layer--near {
+  background:
+    radial-gradient(70% 45% at 40% 88%,
+      rgba(255, 140, 60, 0.16) 0%,
+      rgba(255, 140, 60, 0)    65%);
+}
 .cloud {
   position: absolute;
   left: var(--x);
