@@ -489,9 +489,6 @@
               ${sideToggle('L')}${sideToggle('R')}
             </select>
             <select class="side-state">${stateOptions}</select>
-            <input class="side-lc" type="number" min="0" step="1" value="${s.lessonsCompleted ?? 0}" aria-label="Lessons done">
-            <span class="lessons-sep">/</span>
-            <input class="side-lt" type="number" min="0" step="1" value="${s.lessonsTotal ?? 0}" aria-label="Lessons total">
           </div>
         </div>
         <button class="side-delete" type="button" aria-label="Delete side">
@@ -537,12 +534,6 @@
             <div class="mission-fields__row">
               <label>State</label>
               <select class="mission-state">${stateOptions}</select>
-              <label>Lessons</label>
-              <input class="lessons-completed" type="number" min="0" step="1"
-                     value="${m.lessonsCompleted ?? 0}">
-              <span class="lessons-sep">/</span>
-              <input class="lessons-total" type="number" min="0" step="1"
-                     value="${m.lessonsTotal ?? 0}">
             </div>
             <div class="mission-sides" data-parent="${m.id}">
               ${sidesHtml}
@@ -568,8 +559,6 @@
       const id = row.dataset.id;
       const titleEl = row.querySelector('.mission-title');
       const stateEl = row.querySelector('.mission-state');
-      const lcEl = row.querySelector('.lessons-completed');
-      const ltEl = row.querySelector('.lessons-total');
       const delEl = row.querySelector('.mission-delete');
       const mainThumbEl = row.querySelector('.mission-thumb--main');
       const doneThumbEl = row.querySelector('.mission-thumb--done');
@@ -622,20 +611,6 @@
         renderEditor();
         renderMap();
         renderHeader();
-      });
-      lcEl.addEventListener('input', () => {
-        const m = missions.find(x => x.id === id);
-        if (!m) return;
-        m.lessonsCompleted = Math.max(0, parseInt(lcEl.value, 10) || 0);
-        persist();
-        renderMap();
-      });
-      ltEl.addEventListener('input', () => {
-        const m = missions.find(x => x.id === id);
-        if (!m) return;
-        m.lessonsTotal = Math.max(0, parseInt(ltEl.value, 10) || 0);
-        persist();
-        renderMap();
       });
       delEl.addEventListener('click', () => {
         const idx = missions.findIndex(x => x.id === id);
@@ -690,8 +665,6 @@
       const titleEl = row.querySelector('.side-title');
       const sideSelEl = row.querySelector('.side-side');
       const stateEl = row.querySelector('.side-state');
-      const lcEl = row.querySelector('.side-lc');
-      const ltEl = row.querySelector('.side-lt');
       const delEl = row.querySelector('.side-delete');
       const mainThumbEl = row.querySelector('.mission-thumb--main');
       const doneThumbEl = row.querySelector('.mission-thumb--done');
@@ -723,8 +696,6 @@
       titleEl.addEventListener('input', () => { s.title = titleEl.value.trim(); persist(); renderMap(); });
       sideSelEl.addEventListener('change', () => { s.side = sideSelEl.value; persist(); renderMap(); });
       stateEl.addEventListener('change', () => { s.state = stateEl.value; persist(); renderMap(); });
-      lcEl.addEventListener('input', () => { s.lessonsCompleted = Math.max(0, parseInt(lcEl.value, 10) || 0); persist(); renderMap(); });
-      ltEl.addEventListener('input', () => { s.lessonsTotal = Math.max(0, parseInt(ltEl.value, 10) || 0); persist(); renderMap(); });
       delEl.addEventListener('click', () => {
         const idx = m.sides.findIndex(x => x.id === sideId);
         if (idx >= 0) {
