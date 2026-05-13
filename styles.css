@@ -311,19 +311,34 @@ input { font: inherit; color: inherit; }
   height: calc(var(--island-size) * 1.62);
 }
 
-/* Side missions — branch off from each main, smaller scale. */
+/* Side missions — branch off from each main, clearly smaller scale. */
 .island-slot--side {
-  width: calc(var(--island-size) * 0.55);
+  width: calc(var(--island-size) * 0.45);
 }
 .island-slot--side .island {
-  width: calc(var(--island-size) * 0.55);
-  height: calc(var(--island-size) * 0.55);
+  width: calc(var(--island-size) * 0.45);
+  height: calc(var(--island-size) * 0.45);
 }
 .island-slot--side .island-label {
   font-size: 11px;
   padding: 3px 8px;
   border-radius: 10px;
   bottom: -4px;
+}
+/* Empty-side placeholder — small rounded chip with stacked shadow,
+   replaces the big orange circle used as the default placeholder. */
+.island-placeholder--side {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow:
+    0 3px 0 0 var(--surface-muted),
+    0 6px 14px rgba(24, 19, 12, 0.10);
+  background-image: none;
+  color: var(--text-tertiary);
+  font-size: 16px;
 }
 /* Smaller trail cubes between main and side — 4×2 instead of 12×6. */
 .trail-dot--side {

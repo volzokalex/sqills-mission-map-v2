@@ -348,7 +348,7 @@
         const sImg = (s.state === 'done' && s.imageDataDone) ? s.imageDataDone : s.imageData;
         const sVisual = sImg
           ? `<img src="${sImg}" alt="${escapeHtml(s.title || 'Side mission')}" draggable="false">`
-          : `<div class="island-placeholder">·</div>`;
+          : `<div class="island-placeholder island-placeholder--side"></div>`;
         html += `
           <li class="island-slot island-slot--side" style="left:${sx}%; top:${sy}px;">
             <button class="island island--side state-${s.state}" type="button"
