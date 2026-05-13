@@ -903,8 +903,8 @@
     mid:  { count: 80, sizeMin: 3.5, sizeMax: 5.5 },
     near: { count: 80, sizeMin: 5,   sizeMax: 8.5 }
   };
-  // Warm orange palette — multiple shades so scatter isn't monotone.
-  const pixelPalette = ['#FFB870', '#FF8A32', '#E55F00', '#FFA042', '#FFC54D', '#FF7A1A'];
+  // Dark palette — subtle variation between near-black tones.
+  const pixelPalette = ['#000000', '#0E0B07', '#18130C', '#221A11', '#2A1E13'];
 
   // Seeded RNG so the pixel scatter is stable across reloads.
   function makeRng(seed) {
