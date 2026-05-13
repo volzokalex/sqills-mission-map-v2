@@ -899,9 +899,9 @@
   // Far = slowest + smallest; near = fastest + biggest.
   const speeds = { far: 0.05, mid: 0.30, near: 0.55 };
   const pixelLayerConfig = {
-    far:  { count: 40, sizeMin: 2,   sizeMax: 3.5 },
-    mid:  { count: 40, sizeMin: 3.5, sizeMax: 5.5 },
-    near: { count: 40, sizeMin: 5,   sizeMax: 8.5 }
+    far:  { count: 80, sizeMin: 2,   sizeMax: 3.5 },
+    mid:  { count: 80, sizeMin: 3.5, sizeMax: 5.5 },
+    near: { count: 80, sizeMin: 5,   sizeMax: 8.5 }
   };
   // Warm orange palette — multiple shades so scatter isn't monotone.
   const pixelPalette = ['#FFB870', '#FF8A32', '#E55F00', '#FFA042', '#FFC54D', '#FF7A1A'];
