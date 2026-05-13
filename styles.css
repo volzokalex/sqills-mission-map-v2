@@ -6,7 +6,7 @@
 /* ---------- Tokens ---------- */
 :root {
   /* Surfaces */
-  --canvas:         #FAF8F3;
+  --canvas:         #F0EAD9;
   --surface:        #FFFFFF;
   --surface-subtle: #ECE6D6;
   --surface-muted:  #E5DDC8;
@@ -37,9 +37,9 @@
   --shadow-elev-md: 0 8px 24px rgba(24, 19, 12, 0.10), 0 2px 6px rgba(24, 19, 12, 0.06);
 
   /* Sky / clouds */
-  --sky-top:        #FAF8F3;
-  --sky-mid:        #FAF8F3;
-  --sky-bottom:     #FAF8F3;
+  --sky-top:        #F0EAD9;
+  --sky-mid:        #F0EAD9;
+  --sky-bottom:     #F0EAD9;
   --cloud:          #FFF7E6;
 
   /* Layout */
