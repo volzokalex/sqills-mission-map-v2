@@ -357,8 +357,9 @@
           console.log('[mission-map] locked island tapped:', { id, index });
           return;
         }
-        const mission = missions.find(m => m.id === id);
-        if (mission) openPreview(mission);
+        const target = `https://volzokalex.github.io/shai-mission-page-v3/#mission-${encodeURIComponent(id)}`;
+        console.log('[mission-map] navigating →', target);
+        window.location.href = target;
       };
 
       const abort = () => {
@@ -379,49 +380,6 @@
       el.addEventListener('pointercancel', abort);
     });
   }
-
-  /* ---------- Mission preview overlay ---------- */
-  const previewEl = document.getElementById('missionPreview');
-  const previewTitleEl = document.getElementById('previewTitle');
-  const previewImageEl = document.getElementById('previewImage');
-  const previewCtaEl = document.getElementById('previewCta');
-  let previewMissionId = null;
-
-  function openPreview(mission) {
-    previewMissionId = mission.id;
-    previewTitleEl.textContent = mission.title || `Mission ${missions.indexOf(mission) + 1}`;
-    if (mission.imageData) {
-      previewImageEl.src = mission.imageData;
-      previewImageEl.alt = mission.title || '';
-      previewImageEl.style.display = '';
-    } else {
-      previewImageEl.removeAttribute('src');
-      previewImageEl.style.display = 'none';
-    }
-    previewEl.hidden = false;
-    previewEl.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-  }
-  function closePreview() {
-    previewEl.hidden = true;
-    previewEl.setAttribute('aria-hidden', 'true');
-    previewMissionId = null;
-    document.body.style.overflow = '';
-  }
-  previewEl.addEventListener('click', (e) => {
-    if (e.target.closest('[data-close]')) closePreview();
-  });
-  previewCtaEl.addEventListener('click', () => {
-    if (!previewMissionId) return;
-    // Mission page lives at its own GitHub Pages repo. Same URL for every
-    // mission (only one prototype page exists today); id passes via hash.
-    const target = `https://volzokalex.github.io/shai-mission-page-v3/#mission-${encodeURIComponent(previewMissionId)}`;
-    console.log('[mission-map] navigating from preview →', target);
-    window.location.href = target;
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !previewEl.hidden) closePreview();
-  });
 
   /* ---------- Auto-scroll to current ----------
      Place the current island just below the sticky header, not centred in the
