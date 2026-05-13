@@ -315,8 +315,11 @@
            </span>`
         : '';
 
-      const visual = m.imageData
-        ? `<img src="${m.imageData}" alt="${escapeHtml(m.title || 'Mission ' + (i + 1))}" draggable="false">`
+      // Done state uses imageDataDone if uploaded; otherwise falls back to the
+      // regular image (still gets the desaturate filter from state-done CSS).
+      const imgSrc = (m.state === 'done' && m.imageDataDone) ? m.imageDataDone : m.imageData;
+      const visual = imgSrc
+        ? `<img src="${imgSrc}" alt="${escapeHtml(m.title || 'Mission ' + (i + 1))}" draggable="false">`
         : `<div class="island-placeholder">${i + 1}</div>`;
 
       const slotCls = isLast ? 'island-slot island-slot--last' : 'island-slot';
@@ -413,9 +416,12 @@
     }
     let html = '';
     missions.forEach((m, i) => {
-      const thumb = m.imageData
+      const thumbMain = m.imageData
         ? `<img src="${m.imageData}" alt="" draggable="false">`
         : `<span class="mission-thumb__placeholder">${i + 1}</span>`;
+      const thumbDone = m.imageDataDone
+        ? `<img src="${m.imageDataDone}" alt="" draggable="false">`
+        : `<span class="mission-thumb__hint">done</span>`;
       const stateOptions = STATES.map(s =>
         `<option value="${s}" ${s === m.state ? 'selected' : ''}>${s}</option>`
       ).join('');
@@ -424,7 +430,10 @@
           <span class="mission-drag" aria-label="Drag to reorder" draggable="true">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 5h2v2H9zm0 6h2v2H9zm0 6h2v2H9zm4-12h2v2h-2zm0 6h2v2h-2zm0 6h2v2h-2z"/></svg>
           </span>
-          <span class="mission-thumb">${thumb}</span>
+          <div class="mission-thumbs">
+            <button class="mission-thumb mission-thumb--main" type="button" title="Tap to replace main art">${thumbMain}</button>
+            <button class="mission-thumb mission-thumb--done ${m.imageDataDone ? 'has-img' : ''}" type="button" title="Done-state art (optional)">${thumbDone}</button>
+          </div>
           <div class="mission-fields">
             <input class="mission-title" type="text" placeholder="Mission title"
                    value="${escapeHtml(m.title || '')}" maxlength="60">
@@ -461,6 +470,40 @@
       const lcEl = row.querySelector('.lessons-completed');
       const ltEl = row.querySelector('.lessons-total');
       const delEl = row.querySelector('.mission-delete');
+      const mainThumbEl = row.querySelector('.mission-thumb--main');
+      const doneThumbEl = row.querySelector('.mission-thumb--done');
+
+      const openPicker = (target) => {
+        const inp = document.createElement('input');
+        inp.type = 'file';
+        inp.accept = 'image/png,image/jpeg,image/webp';
+        inp.style.display = 'none';
+        inp.addEventListener('change', async () => {
+          const file = inp.files?.[0];
+          if (!file) return;
+          try {
+            const dataUrl = await fileToResizedDataUrl(file);
+            const m = missions.find(x => x.id === id);
+            if (!m) return;
+            if (target === 'done') {
+              m.imageDataDone = dataUrl;
+            } else {
+              m.imageData = dataUrl;
+              m.cropped = true;
+            }
+            persist();
+            renderEditor();
+            renderMap();
+          } catch (err) {
+            console.error('upload failed', err);
+          }
+        });
+        document.body.appendChild(inp);
+        inp.click();
+        setTimeout(() => inp.remove(), 1000);
+      };
+      mainThumbEl?.addEventListener('click', () => openPicker('main'));
+      doneThumbEl?.addEventListener('click', () => openPicker('done'));
 
       titleEl.addEventListener('input', () => {
         const m = missions.find(x => x.id === id);

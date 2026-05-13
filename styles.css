@@ -527,6 +527,12 @@ input { font: inherit; color: inherit; }
   box-shadow: 0 1px 0 rgba(24, 19, 12, 0.04);
   transition: background 140ms ease, transform 140ms ease, box-shadow 140ms ease;
 }
+.mission-thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
 .mission-row.dragging {
   opacity: 0.4;
 }
@@ -550,20 +556,38 @@ input { font: inherit; color: inherit; }
 .mission-drag svg { width: 18px; height: 18px; }
 
 .mission-thumb {
-  width: 56px;
-  height: 56px;
+  width: 44px;
+  height: 44px;
+  border: 0;
   border-radius: 50%;
   background: var(--surface-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  cursor: pointer;
+  padding: 0;
 }
 .mission-thumb img { width: 100%; height: 100%; object-fit: contain; }
 .mission-thumb__placeholder {
   font-family: 'Manrope', sans-serif;
   font-weight: 700;
   color: var(--primary-600);
+}
+.mission-thumb__hint {
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.mission-thumb--done:not(.has-img) {
+  background: transparent;
+  border: 1.5px dashed var(--border-default);
+}
+.mission-thumb--done.has-img {
+  filter: saturate(0.45) brightness(0.92) contrast(0.95);
 }
 
 .mission-fields {
