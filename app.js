@@ -949,10 +949,10 @@
     layerEl.innerHTML = html;
   }
 
-  // Different seed per layer so scatters don't align.
-  spawnPixelLayer(layers.far,  pixelLayerConfig.far,  101);
-  spawnPixelLayer(layers.mid,  pixelLayerConfig.mid,  202);
-  spawnPixelLayer(layers.near, pixelLayerConfig.near, 303);
+  // Pixel background disabled — re-enable by uncommenting the three calls.
+  // spawnPixelLayer(layers.far,  pixelLayerConfig.far,  101);
+  // spawnPixelLayer(layers.mid,  pixelLayerConfig.mid,  202);
+  // spawnPixelLayer(layers.near, pixelLayerConfig.near, 303);
 
   /* ---------- Bootstrap ---------- */
   renderHeader();
