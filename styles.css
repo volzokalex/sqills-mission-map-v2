@@ -325,20 +325,22 @@ input { font: inherit; color: inherit; }
   border-radius: 10px;
   bottom: -4px;
 }
-/* Empty-side placeholder — small rounded chip with stacked shadow,
-   replaces the big orange circle used as the default placeholder. */
-.island-placeholder--side {
+/* Empty-side placeholder — small rounded chip with stacked shadow.
+   Selector matches the specificity of the base `.island .island-placeholder`
+   sizing rule so we win on cascade order. */
+.island-slot--side .island-placeholder {
   width: 48px;
   height: 48px;
   border-radius: 12px;
   background: var(--surface);
+  background-image: none;
   border: 1px solid var(--border-subtle);
   box-shadow:
     0 3px 0 0 var(--surface-muted),
     0 6px 14px rgba(24, 19, 12, 0.10);
-  background-image: none;
   color: var(--text-tertiary);
   font-size: 16px;
+  margin: auto;                        /* centre the chip inside the (larger) .island button */
 }
 /* Smaller trail cubes between main and side — 4×2 instead of 12×6. */
 .trail-dot--side {
