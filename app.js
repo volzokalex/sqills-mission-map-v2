@@ -57,6 +57,8 @@
     missions = sample.map(m => ({ ...m }));
     Store.save(missions);
   }
+  // Backfill sides on missions that pre-date the side-mission feature.
+  missions.forEach(m => { if (!Array.isArray(m.sides)) m.sides = []; });
 
   /* ---------- Image processing ----------
      Alex supplies uniform-canvas transparent-bg PNGs where the visible island
@@ -291,7 +293,7 @@
         trailHtml += `<div class="trail-dot ${cls}" style="left:${x.toFixed(2)}%;top:${y.toFixed(0)}px;--rot:${rot.toFixed(1)}deg"></div>`;
       }
     }
-    trailEl.innerHTML = trailHtml;
+    // (Trail innerHTML is written AFTER side-trails are also appended below.)
 
     // Islands
     let html = '';
@@ -328,8 +330,68 @@
           </button>
         </li>
       `;
+
+      // Side missions for this main — placed as smaller islands offset L/R.
+      const sides = Array.isArray(m.sides) ? m.sides : [];
+      sides.forEach((s, sIdx) => {
+        const stacksOnThisSide = sides.filter(x => x.side === s.side).indexOf(s);
+        const xOffPct = s.side === 'L' ? -28 : 28;
+        const sx = x + xOffPct;
+        // Stagger Y for multiple sides on the same side: +0, +44, +88 px.
+        const yStaggerPx = stacksOnThisSide * 44;
+        const sy = y + ISLAND_SIZE * 0.42 + yStaggerPx;
+        const sBadge = s.state === 'locked'
+          ? `<span class="island-badge--locked" aria-hidden="true">
+               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 10V8a6 6 0 0 1 12 0v2h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h1zm2 0h8V8a4 4 0 0 0-8 0v2z"/></svg>
+             </span>`
+          : '';
+        const sImg = (s.state === 'done' && s.imageDataDone) ? s.imageDataDone : s.imageData;
+        const sVisual = sImg
+          ? `<img src="${sImg}" alt="${escapeHtml(s.title || 'Side mission')}" draggable="false">`
+          : `<div class="island-placeholder">·</div>`;
+        html += `
+          <li class="island-slot island-slot--side" style="left:${sx}%; top:${sy}px;">
+            <button class="island island--side state-${s.state}" type="button"
+                    data-id="${s.id}" data-state="${s.state}"
+                    aria-label="${escapeHtml(s.title || 'Side mission')}">
+              ${sVisual}
+              ${sBadge}
+              ${s.title ? `<span class="island-label island-label--side">${escapeHtml(s.title)}</span>` : ''}
+            </button>
+          </li>
+        `;
+
+        // Side trail — short chain of small cubes from main centre to side centre.
+        const SIDE_DOTS = 6;
+        const sx1 = x;
+        const sy1 = y + ISLAND_SIZE / 2;
+        const sx2 = sx;
+        const sy2 = sy + (ISLAND_SIZE * 0.55) / 2;
+        const dxPctS = sx2 - sx1;
+        const dyPxS = sy2 - sy1;
+        const lenApproxS = Math.hypot(dxPctS * 2, dyPxS) || 1;
+        const pxS = -dyPxS / lenApproxS;
+        const pyS = (dxPctS * 2) / lenApproxS;
+        const offS = 6 * (s.side === 'L' ? 1 : -1);
+        const cxS = (sx1 + sx2) / 2 + pxS * offS;
+        const cyS = (sy1 + sy2) / 2 + pyS * offS;
+        const sideSolid = (m.state === 'done' || m.state === 'current')
+          && (s.state === 'done' || s.state === 'current');
+        const sideCls = sideSolid ? 'trail-dot--solid trail-dot--side' : 'trail-dot--dashed trail-dot--side';
+        for (let k = 1; k <= SIDE_DOTS; k++) {
+          const t = k / (SIDE_DOTS + 1);
+          const u = 1 - t;
+          const sxk = u * u * sx1 + 2 * u * t * cxS + t * t * sx2;
+          const syk = u * u * sy1 + 2 * u * t * cyS + t * t * sy2;
+          const dxT = 2 * (u * (cxS - sx1) + t * (sx2 - cxS)) * mapWidthPx / 100;
+          const dyT = 2 * (u * (cyS - sy1) + t * (sy2 - cyS));
+          const rot = Math.atan2(dyT, dxT) * 180 / Math.PI;
+          trailHtml += `<div class="trail-dot ${sideCls}" style="left:${sxk.toFixed(2)}%;top:${syk.toFixed(0)}px;--rot:${rot.toFixed(1)}deg"></div>`;
+        }
+      });
     });
     islandsEl.innerHTML = html;
+    trailEl.innerHTML = trailHtml;
     attachIslandHandlers();
   }
 
@@ -402,6 +464,46 @@
   const dropzone = document.getElementById('dropzone');
   const resetAllBtn = document.getElementById('resetAll');
 
+  function sideRowHtml(parentId, s) {
+    const thumb = s.imageData
+      ? `<img src="${s.imageData}" alt="" draggable="false">`
+      : `<span class="mission-thumb__hint">art</span>`;
+    const thumbDone = s.imageDataDone
+      ? `<img src="${s.imageDataDone}" alt="" draggable="false">`
+      : `<span class="mission-thumb__hint">done</span>`;
+    const stateOptions = STATES.map(st =>
+      `<option value="${st}" ${st === s.state ? 'selected' : ''}>${st}</option>`
+    ).join('');
+    const sideToggle = (val) => `<option value="${val}" ${val === s.side ? 'selected' : ''}>${val}</option>`;
+    return `
+      <div class="side-row" data-parent="${parentId}" data-id="${s.id}">
+        <div class="side-thumbs">
+          <button class="mission-thumb mission-thumb--side mission-thumb--main" type="button" title="Tap to replace side art">${thumb}</button>
+          <button class="mission-thumb mission-thumb--side mission-thumb--done ${s.imageDataDone ? 'has-img' : ''}" type="button" title="Done-state art (optional)">${thumbDone}</button>
+        </div>
+        <div class="side-fields">
+          <input class="side-title" type="text" placeholder="Side title"
+                 value="${escapeHtml(s.title || '')}" maxlength="60">
+          <div class="side-fields__row">
+            <select class="side-side" aria-label="Side">
+              ${sideToggle('L')}${sideToggle('R')}
+            </select>
+            <select class="side-state">${stateOptions}</select>
+            <input class="side-lc" type="number" min="0" step="1" value="${s.lessonsCompleted ?? 0}" aria-label="Lessons done">
+            <span class="lessons-sep">/</span>
+            <input class="side-lt" type="number" min="0" step="1" value="${s.lessonsTotal ?? 0}" aria-label="Lessons total">
+          </div>
+        </div>
+        <button class="side-delete" type="button" aria-label="Delete side">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 6l12 12M18 6L6 18"/>
+          </svg>
+        </button>
+      </div>
+    `;
+  }
+
   function renderEditor() {
     if (missions.length === 0) {
       missionListEl.innerHTML = `<li class="editor-empty">No islands yet. Drop a PNG above to add your first mission.</li>`;
@@ -418,6 +520,8 @@
       const stateOptions = STATES.map(s =>
         `<option value="${s}" ${s === m.state ? 'selected' : ''}>${s}</option>`
       ).join('');
+      const sides = Array.isArray(m.sides) ? m.sides : [];
+      const sidesHtml = sides.map((s) => sideRowHtml(m.id, s)).join('');
       html += `
         <li class="mission-row" data-id="${m.id}" data-index="${i}" draggable="false">
           <span class="mission-drag" aria-label="Drag to reorder" draggable="true">
@@ -439,6 +543,10 @@
               <span class="lessons-sep">/</span>
               <input class="lessons-total" type="number" min="0" step="1"
                      value="${m.lessonsTotal ?? 0}">
+            </div>
+            <div class="mission-sides" data-parent="${m.id}">
+              ${sidesHtml}
+              <button class="mission-add-side" type="button" data-parent="${m.id}">+ Add side mission</button>
             </div>
           </div>
           <button class="mission-delete" type="button" aria-label="Delete mission">
@@ -537,6 +645,93 @@
           renderEditor();
           renderMap();
           renderHeader();
+        }
+      });
+    });
+
+    // Side-mission row handlers + Add side button.
+    attachSideHandlers();
+  }
+
+  function attachSideHandlers() {
+    missionListEl.querySelectorAll('.mission-add-side').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const parentId = btn.dataset.parent;
+        const m = missions.find(x => x.id === parentId);
+        if (!m) return;
+        if (!Array.isArray(m.sides)) m.sides = [];
+        if (m.sides.length >= 3) return;            // soft cap at 3
+        const occupiedSides = new Set(m.sides.map(s => s.side));
+        const newSide = {
+          id: 's_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6),
+          title: '',
+          imageData: '',
+          imageDataDone: '',
+          state: 'available',
+          side: occupiedSides.has('L') && !occupiedSides.has('R') ? 'R' : 'L',
+          lessonsCompleted: 0,
+          lessonsTotal: 3
+        };
+        m.sides.push(newSide);
+        persist();
+        renderEditor();
+        renderMap();
+      });
+    });
+
+    missionListEl.querySelectorAll('.side-row').forEach(row => {
+      const parentId = row.dataset.parent;
+      const sideId = row.dataset.id;
+      const m = missions.find(x => x.id === parentId);
+      if (!m) return;
+      const s = (m.sides || []).find(x => x.id === sideId);
+      if (!s) return;
+
+      const titleEl = row.querySelector('.side-title');
+      const sideSelEl = row.querySelector('.side-side');
+      const stateEl = row.querySelector('.side-state');
+      const lcEl = row.querySelector('.side-lc');
+      const ltEl = row.querySelector('.side-lt');
+      const delEl = row.querySelector('.side-delete');
+      const mainThumbEl = row.querySelector('.mission-thumb--main');
+      const doneThumbEl = row.querySelector('.mission-thumb--done');
+
+      const openPicker = (target) => {
+        const inp = document.createElement('input');
+        inp.type = 'file';
+        inp.accept = 'image/png,image/jpeg,image/webp';
+        inp.style.display = 'none';
+        inp.addEventListener('change', async () => {
+          const file = inp.files?.[0];
+          if (!file) return;
+          try {
+            const dataUrl = await fileToResizedDataUrl(file);
+            if (target === 'done') s.imageDataDone = dataUrl;
+            else s.imageData = dataUrl;
+            persist();
+            renderEditor();
+            renderMap();
+          } catch (err) { console.error('side upload failed', err); }
+        });
+        document.body.appendChild(inp);
+        inp.click();
+        setTimeout(() => inp.remove(), 1000);
+      };
+      mainThumbEl?.addEventListener('click', () => openPicker('main'));
+      doneThumbEl?.addEventListener('click', () => openPicker('done'));
+
+      titleEl.addEventListener('input', () => { s.title = titleEl.value.trim(); persist(); renderMap(); });
+      sideSelEl.addEventListener('change', () => { s.side = sideSelEl.value; persist(); renderMap(); });
+      stateEl.addEventListener('change', () => { s.state = stateEl.value; persist(); renderMap(); });
+      lcEl.addEventListener('input', () => { s.lessonsCompleted = Math.max(0, parseInt(lcEl.value, 10) || 0); persist(); renderMap(); });
+      ltEl.addEventListener('input', () => { s.lessonsTotal = Math.max(0, parseInt(ltEl.value, 10) || 0); persist(); renderMap(); });
+      delEl.addEventListener('click', () => {
+        const idx = m.sides.findIndex(x => x.id === sideId);
+        if (idx >= 0) {
+          m.sides.splice(idx, 1);
+          persist();
+          renderEditor();
+          renderMap();
         }
       });
     });

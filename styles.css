@@ -302,13 +302,44 @@ input { font: inherit; color: inherit; }
   width: var(--island-size);
   transform: translateX(-50%);
 }
-/* Last mission — centered horizontally + 30% bigger. */
+/* Last mission — centered horizontally + bigger. */
 .island-slot--last {
   width: calc(var(--island-size) * 1.62);
 }
 .island-slot--last .island {
   width: calc(var(--island-size) * 1.62);
   height: calc(var(--island-size) * 1.62);
+}
+
+/* Side missions — branch off from each main, smaller scale. */
+.island-slot--side {
+  width: calc(var(--island-size) * 0.55);
+}
+.island-slot--side .island {
+  width: calc(var(--island-size) * 0.55);
+  height: calc(var(--island-size) * 0.55);
+}
+.island-slot--side .island-label {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  bottom: -4px;
+}
+/* Smaller trail cubes between main and side — 4×2 instead of 12×6. */
+.trail-dot--side {
+  width: 4px;
+  height: 2px;
+  border-radius: 1px;
+}
+.trail-dot--side.trail-dot--solid {
+  box-shadow:
+    0 1px 0 0 var(--primary-700),
+    0 2px 4px rgba(229, 95, 0, 0.30);
+}
+.trail-dot--side.trail-dot--dashed {
+  box-shadow:
+    0 1px 0 0 #8A6A45,
+    0 2px 4px rgba(140, 100, 60, 0.22);
 }
 .island {
   position: relative;
@@ -652,6 +683,87 @@ input { font: inherit; color: inherit; }
   color: #C53030;
 }
 .mission-delete svg { width: 16px; height: 16px; }
+
+/* Side-mission sub-rows inside a main row's fields column. */
+.mission-sides {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+  padding-left: 8px;
+  border-left: 2px solid var(--border-subtle);
+}
+.mission-add-side {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px dashed var(--border-default);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.mission-add-side:hover { color: var(--primary-600); border-color: var(--primary-500); }
+.side-row {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--surface-subtle);
+  border-radius: 8px;
+}
+.side-thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+.mission-thumb--side {
+  width: 32px;
+  height: 32px;
+}
+.side-fields { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.side-title {
+  font-size: 13px;
+  padding: 4px 6px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  background: var(--canvas);
+  width: 100%;
+  min-width: 0;
+}
+.side-fields__row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  font-size: 11px;
+}
+.side-fields__row select,
+.side-fields__row input {
+  font-size: 11px;
+  padding: 3px 5px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  background: var(--canvas);
+}
+.side-fields__row .side-lc,
+.side-fields__row .side-lt { width: 38px; text-align: center; }
+.side-delete {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: 50%;
+}
+.side-delete:hover { background: rgba(220, 53, 53, 0.10); color: #C53030; }
+.side-delete svg { width: 14px; height: 14px; }
 
 .editor-actions {
   display: flex;
