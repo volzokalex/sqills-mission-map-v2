@@ -231,9 +231,7 @@ input { font: inherit; color: inherit; }
 .cloud-layer {
   position: absolute;
   top: 0; left: 0; right: 0;
-  /* Extra height so the layer doesn't expose gap as it translates up. */
-  height: 220%;
-  will-change: transform;
+  height: 100%;
 }
 
 /* Pixel-confetti parallax dots. Each pixel reads as a small block lifted

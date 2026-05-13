@@ -890,14 +890,14 @@
     activateTab(a.dataset.go);
   });
 
-  /* ---------- Parallax (rAF-driven) ---------- */
+  /* ---------- Static pixel background ----------
+     Parallax disabled — layers scroll with the map naturally. Three depth
+     tiers still give relief, but pixels stay anchored to map positions. */
   const layers = {
     far:  document.querySelector('.cloud-layer--far'),
     mid:  document.querySelector('.cloud-layer--mid'),
     near: document.querySelector('.cloud-layer--near')
   };
-  // Far = slowest + smallest; near = fastest + biggest.
-  const speeds = { far: 0.05, mid: 0.30, near: 0.55 };
   // depthWeights: cumulative thresholds for d1/d2/d3 — far layer is flat,
   // near layer has the most "tall" blocks (deep stacked shadow).
   const pixelLayerConfig = {
@@ -953,24 +953,6 @@
   spawnPixelLayer(layers.far,  pixelLayerConfig.far,  101);
   spawnPixelLayer(layers.mid,  pixelLayerConfig.mid,  202);
   spawnPixelLayer(layers.near, pixelLayerConfig.near, 303);
-
-  let parallaxFrame = null;
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  function tickParallax() {
-    parallaxFrame = null;
-    if (prefersReducedMotion) return;
-    const y = window.scrollY;
-    for (const key of Object.keys(layers)) {
-      const el = layers[key];
-      if (!el) continue;
-      el.style.transform = `translate3d(0, ${(-y * speeds[key]).toFixed(2)}px, 0)`;
-    }
-  }
-  function onScroll() {
-    if (parallaxFrame === null) parallaxFrame = requestAnimationFrame(tickParallax);
-  }
-  window.addEventListener('scroll', onScroll, { passive: true });
 
   /* ---------- Bootstrap ---------- */
   renderHeader();
