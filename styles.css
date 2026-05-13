@@ -402,6 +402,24 @@ input { font: inherit; color: inherit; }
               filter 200ms ease;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  isolation: isolate;
+}
+/* Soft elliptical ground shadow under each island — sits behind the art so
+   it survives whatever the state filter does (it overrides img.filter). */
+.island::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 4%;
+  width: 58%;
+  height: 10%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse closest-side,
+              rgba(24, 19, 12, 0.32) 0%,
+              rgba(24, 19, 12, 0) 72%);
+  filter: blur(3px);
+  pointer-events: none;
+  z-index: 0;
 }
 .island img,
 .island .island-placeholder {
@@ -409,6 +427,8 @@ input { font: inherit; color: inherit; }
   height: 100%;
   object-fit: contain;
   pointer-events: none;
+  position: relative;
+  z-index: 1;
   transition: filter 200ms ease;
 }
 .island-placeholder {
