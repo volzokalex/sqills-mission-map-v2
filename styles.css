@@ -231,7 +231,9 @@ input { font: inherit; color: inherit; }
 .cloud-layer {
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 100%;
+  /* Extra height so the upward translate doesn't expose a gap at bottom. */
+  height: 220%;
+  will-change: transform;
 }
 
 /* Pixel-confetti parallax dots. Each pixel reads as a small block lifted
@@ -280,12 +282,11 @@ input { font: inherit; color: inherit; }
   image-rendering: pixelated;       /* preserve pixel-edges of the asset */
   image-rendering: -webkit-optimize-contrast;
 }
-/* Per-cloud opacity comes from inline `--o` (random 0.40-0.70).
-   Slight desaturation + brightness lift gives a whiter / cleaner cloud feel
-   while preserving the watercolor texture. */
+/* Per-cloud opacity comes from inline `--o`. Voxel asset already reads as
+   a desaturated whitish block — no extra filter, so the orange pixel
+   accents stay vivid. */
 .cloud {
   opacity: var(--o, 0.55);
-  filter: saturate(0.55) brightness(1.10);
 }
 
 .map {
