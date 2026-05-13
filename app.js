@@ -378,7 +378,7 @@
         `;
 
         // Side trail — short chain of small cubes from main centre to side centre.
-        const SIDE_DOTS = 6;
+        const SIDE_DOTS = 12;
         const sx1 = x;
         const sy1 = y + ISLAND_SIZE / 2;
         const sx2 = sx;
