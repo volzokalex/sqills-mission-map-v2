@@ -429,12 +429,29 @@ input { font: inherit; color: inherit; }
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
+/* Warm amber glow under every station — spills onto the pedestal below. */
+.island::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -22%;
+  width: 78%;
+  height: 32%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse closest-side,
+    rgba(255, 138, 50, 0.55) 0%,
+    rgba(255, 138, 50, 0.20) 45%,
+    rgba(255, 138, 50, 0)    72%);
+  filter: blur(6px);
+  pointer-events: none;
+}
 .island img,
 .island .island-placeholder {
   width: 100%;
   height: 100%;
   object-fit: contain;
   pointer-events: none;
+  position: relative;       /* paints above the ::before glow */
   transition: filter 200ms ease;
 }
 .island-placeholder {
