@@ -934,14 +934,12 @@
       const o = oMin + rng() * (oMax - oMin);
       const flip = rng() < 0.5 ? 'scaleX(-1)' : 'scaleX(1)';
       const src = CLOUD_SRCS[Math.floor(rng() * CLOUD_SRCS.length)];
-      // data-max-o = peak opacity. Current opacity starts at 0 and is
-      // driven each frame by tickParallax (distance from viewport centre).
       html +=
-        `<img class="cloud" src="${src}" alt="" draggable="false" data-max-o="${o.toFixed(3)}" style="` +
+        `<img class="cloud" src="${src}" alt="" draggable="false" style="` +
         `--x:${x.toFixed(2)}%;` +
         `--y:${y.toFixed(2)}%;` +
         `--w:${w.toFixed(0)}px;` +
-        `--o:0;` +
+        `--o:${o.toFixed(2)};` +
         `--tx:${flip}` +
         `">`;
     }
@@ -951,7 +949,6 @@
   spawnCloudLayer(layers.far,  cloudLayerConfig.far,  111);
   spawnCloudLayer(layers.mid,  cloudLayerConfig.mid,  222);
   spawnCloudLayer(layers.near, cloudLayerConfig.near, 333);
-  let allClouds = document.querySelectorAll('.cloud');
 
   let parallaxFrame = null;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -965,28 +962,11 @@
       if (!el) continue;
       el.style.transform = `translate3d(0, ${(-y * speeds[key]).toFixed(2)}px, 0)`;
     }
-    // Fade every cloud by distance from viewport centre — clouds appear
-    // as they approach the centre line and dissolve as they leave.
-    const vh = window.innerHeight;
-    const vCenter = vh / 2;
-    const fadeWindow = vh * 0.65;
-    allClouds.forEach(c => {
-      const r = c.getBoundingClientRect();
-      const cy = r.top + r.height / 2;
-      const dist = Math.abs(cy - vCenter);
-      const t = Math.min(1, dist / fadeWindow);
-      const fade = 1 - t * t * (3 - 2 * t);  // smoothstep
-      const maxO = parseFloat(c.dataset.maxO) || 0.7;
-      c.style.opacity = (maxO * fade).toFixed(3);
-    });
   }
   function onScroll() {
     if (parallaxFrame === null) parallaxFrame = requestAnimationFrame(tickParallax);
   }
   window.addEventListener('scroll', onScroll, { passive: true });
-  // Run once at boot so clouds get their initial opacity (instead of all
-  // sitting at --o:0 until the user first scrolls).
-  requestAnimationFrame(tickParallax);
 
   /* ---------- Bootstrap ---------- */
   renderHeader();
