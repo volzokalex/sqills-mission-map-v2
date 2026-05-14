@@ -19,8 +19,8 @@
   // tuned so pedestals share their diamond corners (tight iso) but the
   // stations on top have visible breathing room between them.
   const TERRAIN_TILE_PCT = 0.43;     // pedestal width as fraction of viewport
-  const ISO_STEP_X_RATIO = 0.50;     // halfW = pedestalW × 0.50  (diamonds touch at L/R points)
-  const ISO_STEP_Y_RATIO = 0.25;     // halfH = pedestalW × 0.25  (true 2:1 iso — diamonds touch at top/bottom)
+  const ISO_STEP_X_RATIO = 0.65;     // halfW = pedestalW × 0.65  (visible gap between pedestals)
+  const ISO_STEP_Y_RATIO = 0.40;     // halfH = pedestalW × 0.40  (extra vertical room)
   const ALPHA_CROP_THRESHOLD = 8;    // alpha below this counts as transparent for auto-crop
   const MAX_PNG_SIDE = 512;          // resize cap before storing
   const STATES = ['available', 'current', 'done', 'locked'];
