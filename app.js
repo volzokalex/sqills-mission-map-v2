@@ -1119,9 +1119,8 @@
     }
     host.innerHTML = html;
   }
-  // Pedestal tile under specific missions. Edit PEDESTAL_MISSION_IDS to
-  // change which missions get the platform.
-  const PEDESTAL_MISSION_IDS = [0, 1, 2, 3];  // missions #1..#4
+  // Pedestal tile under EVERY mission, using the placement that already
+  // looks right for mission #1. Same tileW + TILE_Y_OFFSET for all.
   function placePedestals() {
     const host = document.getElementById('terrainLayer');
     if (!host || missions.length === 0) return;
@@ -1129,14 +1128,12 @@
     const appW   = (parallax && parallax.offsetWidth) || 430;
     const tileW  = appW * 0.62;
     const diamondCenterInImg = tileW * 0.25;
-    // Rule: tile sits VISUALLY beneath the station (like a pedestal) — the
-    // station's island art reads as standing on top of the platform. This
-    // offset is the gap between mission centre and tile diamond centre.
+    // Rule: tile sits VISUALLY beneath the station — same relative offset
+    // on every mission so the relationship reads identical map-wide.
     const TILE_Y_OFFSET = 40;
     const left = (appW / 2) - (tileW / 2);
     let html = '';
-    for (const idx of PEDESTAL_MISSION_IDS) {
-      if (idx >= missions.length) continue;
+    for (let idx = 0; idx < missions.length; idx++) {
       const missionCenterY = ISLAND_TOP_OFFSET + idx * ISLAND_PITCH + ISLAND_SIZE / 2;
       const top = missionCenterY - diamondCenterInImg + TILE_Y_OFFSET;
       html +=
