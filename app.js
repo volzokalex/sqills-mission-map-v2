@@ -1012,41 +1012,48 @@
   const TERRAIN_TILE_PCT      = 0.40;    // tile width = 40% of app width
   const TERRAIN_IMG_ASPECT    = 621 / 768; // PNG height / width
   const TERRAIN_DIAMOND_RATIO = 0.50;    // diamond height / diamond width (2:1 iso)
+  // Spacing multipliers: 1.0 = diamond vertices just touch; >1 = visible
+  // cliff face between rows / gap between sides.
+  const TERRAIN_STEP_X_MULT   = 1.0;
+  const TERRAIN_STEP_Y_MULT   = 1.55;
   const TERRAIN_MARGIN_TILES  = 1;       // extra rings of tiles outside viewport
 
   function injectTerrain() {
     const host = document.getElementById('terrainLayer');
     if (!host) return;
     const parallax = document.querySelector('.parallax');
-    const appW   = (parallax && parallax.offsetWidth) || 430;
-    const tileW  = appW * TERRAIN_TILE_PCT;
-    const tileH  = tileW * TERRAIN_IMG_ASPECT;
-    const halfW  = tileW / 2;
-    const halfH  = tileW * TERRAIN_DIAMOND_RATIO / 2;
-    // Diamond top vertex sits at IMG top edge, so its centre is halfH below.
-    const diamondCenterInImg = halfH;
-    const mapH   = (mapEl && mapEl.offsetHeight) || 2000;
+    const appW    = (parallax && parallax.offsetWidth) || 430;
+    const tileW   = appW * TERRAIN_TILE_PCT;
+    const tileH   = tileW * TERRAIN_IMG_ASPECT;
+    const imgHalfW = tileW / 2;
+    // Diamond top vertex sits at the IMG's top edge, so its centre is the
+    // diamond half-height below the IMG top.
+    const diamondHalfH = tileW * TERRAIN_DIAMOND_RATIO / 2;
+    // Iso step between tile centres (independent of IMG size).
+    const stepX = imgHalfW * TERRAIN_STEP_X_MULT;
+    const stepY = diamondHalfH * TERRAIN_STEP_Y_MULT;
+    const mapH    = (mapEl && mapEl.offsetHeight) || 2000;
     const centerX = appW / 2;
 
     // Iso (i, j) → screen (cx, cy).
-    //   cx = (i - j) * halfW + centerX
-    //   cy = (i + j) * halfH
+    //   cx = (i - j) * stepX + centerX
+    //   cy = (i + j) * stepY
     // We iterate by sum = i+j and diff = i-j; sum + diff must be even.
-    const sumMax   = Math.ceil((mapH + tileH) / halfH) + TERRAIN_MARGIN_TILES * 2;
-    const diffSpan = Math.ceil((appW / halfW) / 2) + TERRAIN_MARGIN_TILES + 1;
+    const sumMax   = Math.ceil((mapH + tileH) / stepY) + TERRAIN_MARGIN_TILES * 2;
+    const diffSpan = Math.ceil((appW / stepX) / 2) + TERRAIN_MARGIN_TILES + 1;
 
     const tiles = [];
     for (let sum = 0; sum <= sumMax; sum++) {
       for (let diff = -diffSpan; diff <= diffSpan; diff++) {
         if (((sum + diff) & 1) !== 0) continue; // need same parity
-        const cx = diff * halfW + centerX;
-        const cy = sum * halfH;
-        // IMG top-left = (cx - halfW, cy - diamondCenterInImg)
-        const left = cx - halfW;
-        const top  = cy - diamondCenterInImg;
-        // Quick visibility cull
-        if (left + tileW < -halfW) continue;
-        if (left > appW + halfW) continue;
+        const cx = diff * stepX + centerX;
+        const cy = sum * stepY;
+        // IMG sits centred horizontally on cx; its diamond top vertex
+        // touches the IMG top edge, so we shift up by diamondHalfH.
+        const left = cx - imgHalfW;
+        const top  = cy - diamondHalfH;
+        if (left + tileW < -imgHalfW) continue;
+        if (left > appW + imgHalfW) continue;
         if (top + tileH < 0) continue;
         if (top > mapH + tileH) continue;
         tiles.push({ sum, left, top });
