@@ -11,14 +11,14 @@
   const STORAGE_KEY = 'missionMap.missions';
   const PRESS_NAV_DELAY_MS = 280;
   const ISLAND_TOP_OFFSET = 24;      // top padding inside the map (px)
-  const ISLAND_SIZE = 133;           // visual island size (px) — was 190, shrunk 0.70× for cluster fit
+  const ISLAND_SIZE = 160;           // visual island size (px) — proportional 1.20× bump
   // Cluster (iso-group) layout constants — replaces vertical-pitch + sine zig-zag.
-  const GROUP_GAP        = 120;      // px gap between iso clusters
+  const GROUP_GAP        = 144;      // px gap between iso clusters (was 120, +20%)
   const CLUSTER_VIEWPORT_W = 430;    // baseline app width for percent conversion
   // Iso step is keyed to the PEDESTAL width (not station). Multipliers
   // tuned so pedestals share their diamond corners (tight iso) but the
   // stations on top have visible breathing room between them.
-  const TERRAIN_TILE_PCT = 0.43;     // pedestal width as fraction of viewport
+  const TERRAIN_TILE_PCT = 0.516;    // pedestal width as fraction of viewport (was 0.43, +20%)
   const ISO_STEP_X_RATIO = 0.65;     // halfW = pedestalW × 0.65  (visible gap between pedestals)
   const ISO_STEP_Y_RATIO = 0.40;     // halfH = pedestalW × 0.40  (extra vertical room)
   const ALPHA_CROP_THRESHOLD = 8;    // alpha below this counts as transparent for auto-crop
@@ -1232,7 +1232,7 @@
     const parallax = document.querySelector('.parallax');
     const appW   = (parallax && parallax.offsetWidth) || 430;
     const baseTileW   = appW * TERRAIN_TILE_PCT;
-    const TILE_Y_OFFSET = 28;                   // tile sits VISUALLY beneath station
+    const TILE_Y_OFFSET = 34;                   // tile sits VISUALLY beneath station (proportional)
     const count = missions.length;
     const layout = ensureLayout(count);
     let html = '';

@@ -47,7 +47,7 @@
   --pad-x:          16px;
   --header-h:       148px; /* identity band 6 + pill row 64 + progress 22 + tabs 56 */
   --island-pitch:   230px; /* vertical distance between island centers */
-  --island-size:    133px;
+  --island-size:    160px;
 }
 
 /* ---------- Reset ---------- */
