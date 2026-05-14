@@ -908,9 +908,7 @@
   const CLOUD_SRCS = [
     'assets/clouds/steam-1.png?v=2',
     'assets/clouds/steam-2.png?v=2',
-    'assets/clouds/steam-3.png?v=2',
-    'assets/clouds/steam-4.jpg?v=2',
-    'assets/clouds/steam-5.jpg?v=2'
+    'assets/clouds/steam-3.png?v=2'
   ];
 
   // Seeded RNG so cloud scatter is stable across reloads.
