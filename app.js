@@ -1129,13 +1129,15 @@
     const appW   = (parallax && parallax.offsetWidth) || 430;
     const tileW  = appW * 0.62;
     const diamondCenterInImg = tileW * 0.25;
-    const TILE_Y_OFFSET = 40;
+    // Rule: tile must sit exactly under the station — diamond centre
+    // aligned with mission centre, both horizontally and vertically.
+    // Do not add Y offsets without an explicit ask.
     const left = (appW / 2) - (tileW / 2);
     let html = '';
     for (const idx of PEDESTAL_MISSION_IDS) {
       if (idx >= missions.length) continue;
       const missionCenterY = ISLAND_TOP_OFFSET + idx * ISLAND_PITCH + ISLAND_SIZE / 2;
-      const top = missionCenterY - diamondCenterInImg + TILE_Y_OFFSET;
+      const top = missionCenterY - diamondCenterInImg;
       html +=
         `<img class="terrain-tile" src="assets/terrain/blackland.png?v=1" ` +
         `alt="" draggable="false" ` +
