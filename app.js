@@ -1131,11 +1131,16 @@
     // Rule: tile sits VISUALLY beneath the station — same relative offset
     // on every mission so the relationship reads identical map-wide.
     const TILE_Y_OFFSET = 40;
-    const left = (appW / 2) - (tileW / 2);
+    const count = missions.length;
     let html = '';
-    for (let idx = 0; idx < missions.length; idx++) {
+    for (let idx = 0; idx < count; idx++) {
+      // Match the mission's zig-zag X — islands drift between
+      // 50% ± ISLAND_X_AMPLITUDE; pedestals must follow them.
+      const missionCenterXPct = islandXPct(idx, count);
+      const missionCenterX = (missionCenterXPct / 100) * appW;
       const missionCenterY = ISLAND_TOP_OFFSET + idx * ISLAND_PITCH + ISLAND_SIZE / 2;
-      const top = missionCenterY - diamondCenterInImg + TILE_Y_OFFSET;
+      const left = missionCenterX - tileW / 2;
+      const top  = missionCenterY - diamondCenterInImg + TILE_Y_OFFSET;
       html +=
         `<img class="terrain-tile" src="assets/terrain/blackland.png?v=1" ` +
         `alt="" draggable="false" ` +
