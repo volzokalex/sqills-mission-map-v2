@@ -14,8 +14,13 @@
   const ISLAND_SIZE = 133;           // visual island size (px) — was 190, shrunk 0.70× for cluster fit
   // Cluster (iso-group) layout constants — replaces vertical-pitch + sine zig-zag.
   const GROUP_GAP        = 120;      // px gap between iso clusters
-  const ISO_DIAMOND_RAT  = 0.5;      // halfH = halfW × this (2:1 iso)
   const CLUSTER_VIEWPORT_W = 430;    // baseline app width for percent conversion
+  // Iso step is keyed to the PEDESTAL width (not station). Multipliers
+  // tuned so pedestals share their diamond corners (tight iso) but the
+  // stations on top have visible breathing room between them.
+  const TERRAIN_TILE_PCT = 0.43;     // pedestal width as fraction of viewport
+  const ISO_STEP_X_RATIO = 0.55;     // halfW = pedestalW × ratio  (≈ pedestal half-width)
+  const ISO_STEP_Y_RATIO = 0.65;     // halfH = pedestalW × ratio  (looser than 2:1 iso for breathing)
   const ALPHA_CROP_THRESHOLD = 8;    // alpha below this counts as transparent for auto-crop
   const MAX_PNG_SIDE = 512;          // resize cap before storing
   const STATES = ['available', 'current', 'done', 'locked'];
@@ -238,9 +243,10 @@
   }
   function computeMissionLayout(count) {
     if (!count) return { positions: [], totalHeight: 0 };
-    const halfW       = ISLAND_SIZE / 2;                   // iso step (px) — uses station size as unit
-    const halfH       = halfW * ISO_DIAMOND_RAT;           // iso half-height
-    const halfW_pct   = (halfW / CLUSTER_VIEWPORT_W) * 100;
+    const pedestalWBase = TERRAIN_TILE_PCT * CLUSTER_VIEWPORT_W;
+    const halfW         = pedestalWBase * ISO_STEP_X_RATIO;
+    const halfH         = pedestalWBase * ISO_STEP_Y_RATIO;
+    const halfW_pct     = (halfW / CLUSTER_VIEWPORT_W) * 100;
     const positions   = new Array(count);
     const groups      = planGroups(count);
     let groupTopY     = ISLAND_TOP_OFFSET;
@@ -1213,7 +1219,7 @@
     if (!host || missions.length === 0) return;
     const parallax = document.querySelector('.parallax');
     const appW   = (parallax && parallax.offsetWidth) || 430;
-    const baseTileW   = appW * 0.43;            // shrunk to fit iso clusters
+    const baseTileW   = appW * TERRAIN_TILE_PCT;
     const TILE_Y_OFFSET = 28;                   // tile sits VISUALLY beneath station
     const count = missions.length;
     const layout = ensureLayout(count);
