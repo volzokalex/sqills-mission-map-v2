@@ -281,6 +281,12 @@ input { font: inherit; color: inherit; }
      canvas (white * cream = cream). Transparent PNGs are unaffected. */
   mix-blend-mode: multiply;
 }
+/* Warm-amber tint for a subset of clouds. sepia colorizes the near-
+   achromatic voxel art to brown, saturate amplifies, hue-rotate shifts
+   the result into a soft orange. */
+.cloud--orange {
+  filter: sepia(0.65) saturate(2.2) hue-rotate(-18deg);
+}
 /* Per-cloud opacity comes from inline `--o`. Voxel asset already reads as
    a desaturated whitish block — no extra filter, so the orange pixel
    accents stay vivid. */

@@ -934,8 +934,10 @@
       const o = oMin + rng() * (oMax - oMin);
       const flip = rng() < 0.5 ? 'scaleX(-1)' : 'scaleX(1)';
       const src = CLOUD_SRCS[Math.floor(rng() * CLOUD_SRCS.length)];
+      // ~25% of clouds get the warm-amber tint variant.
+      const orangeCls = rng() < 0.25 ? ' cloud--orange' : '';
       html +=
-        `<img class="cloud" src="${src}" alt="" draggable="false" style="` +
+        `<img class="cloud${orangeCls}" src="${src}" alt="" draggable="false" style="` +
         `--x:${x.toFixed(2)}%;` +
         `--y:${y.toFixed(2)}%;` +
         `--w:${w.toFixed(0)}px;` +
