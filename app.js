@@ -1126,7 +1126,7 @@
     if (!host || missions.length === 0) return;
     const parallax = document.querySelector('.parallax');
     const appW   = (parallax && parallax.offsetWidth) || 430;
-    const tileW  = appW * 0.77;                // ~30% smaller than viewport
+    const tileW  = appW * 0.62;                // shrunk a further 20%
     const diamondCenterInImg = tileW * 0.25;    // 2:1 iso → diamond half-height
     const missionCenterY = ISLAND_TOP_OFFSET + 0 * ISLAND_PITCH + ISLAND_SIZE / 2;
     const TILE_Y_OFFSET = 40;                   // shift pedestal down by Npx
