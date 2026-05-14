@@ -238,12 +238,10 @@ input { font: inherit; color: inherit; }
 }
 .terrain-tile {
   position: absolute;
-  left: 0;
-  width: 100%;
+  width: var(--tw, 50%);
   height: auto;
   display: block;
   pointer-events: none;
-  /* Pixel-art preservation for the voxel asset. */
   image-rendering: pixelated;
   image-rendering: -webkit-optimize-contrast;
 }

@@ -994,33 +994,44 @@
   window.addEventListener('scroll', onScroll, { passive: true });
 
   /* ---------- Iso voxel-terrain tiling ----------
-     Stacks N copies of the iso terrain tile vertically inside .terrain-layer
-     to cover the full map height. Each tile renders at full app width with
-     auto height (preserves the asset's square aspect). Consecutive tiles
-     overlap by TERRAIN_OVERLAP so the cliff face of one is hidden behind
-     the back-point of the next — gives continuous iso landscape.
+     Iso-brick pattern: tiles are small squares, every other row is offset
+     horizontally by half a tile, vertical step is less than tile height
+     so cliff faces tuck behind the next row's back-point — a continuous
+     iso "floor" made of repeating biome plates.
 
-     DOM order = painter's order: the top-most tile is the first child,
-     the bottom-most tile is the last. The browser paints them in DOM
-     order, so each lower tile is drawn ON TOP of the previous one, which
-     is exactly what we want for iso depth (front-tiles cover back-tiles). */
+     Painter's order is by row (top row first in DOM → bottom row last),
+     so front-rows correctly paint over back-rows for iso depth. */
   const TERRAIN_TILE_SRC = 'assets/terrain/tile.png?v=1';
-  const TERRAIN_ASPECT   = 1.0;     // source PNG is approximately square
-  const TERRAIN_OVERLAP  = 0.14;    // 14% of tile height — hides the cliff seam
+  const TERRAIN_TILE_PCT = 0.50;   // tile width = 50% of app width
+  const TERRAIN_ASPECT   = 1.0;    // square asset
+  const TERRAIN_Y_STEP   = 0.62;   // vertical row step as fraction of tile height
+  const TERRAIN_OVERSHOOT = 1;     // extra tiles beyond viewport edges per row
 
   function injectTerrain() {
     const host = document.getElementById('terrainLayer');
     if (!host) return;
     const parallax = document.querySelector('.parallax');
-    const w = (parallax && parallax.offsetWidth) || 430;
-    const tileH = w * TERRAIN_ASPECT;
-    const step  = tileH * (1 - TERRAIN_OVERLAP);
-    const mapH  = (mapEl && mapEl.offsetHeight) || 2000;
-    const count = Math.max(1, Math.ceil(mapH / step) + 1);
+    const appW   = (parallax && parallax.offsetWidth) || 430;
+    const tileW  = appW * TERRAIN_TILE_PCT;
+    const tileH  = tileW * TERRAIN_ASPECT;
+    const xStep  = tileW;
+    const yStep  = tileH * TERRAIN_Y_STEP;
+    const mapH   = (mapEl && mapEl.offsetHeight) || 2000;
+    const rows   = Math.max(1, Math.ceil(mapH / yStep) + 1);
+    // Fit at least 2 tiles across + overshoot on both sides for offset rows.
+    const colsBase = Math.ceil(appW / xStep) + TERRAIN_OVERSHOOT * 2;
     let html = '';
-    for (let i = 0; i < count; i++) {
-      const top = (i * step).toFixed(2);
-      html += `<img class="terrain-tile" src="${TERRAIN_TILE_SRC}" alt="" draggable="false" style="top:${top}px">`;
+    for (let j = 0; j < rows; j++) {
+      const top = j * yStep;
+      const offsetX = (j % 2) * (xStep / 2);
+      // Start one tile left of viewport so offset rows still cover the edge.
+      const startX = -xStep + offsetX;
+      for (let i = 0; i < colsBase; i++) {
+        const left = startX + i * xStep;
+        html +=
+          `<img class="terrain-tile" src="${TERRAIN_TILE_SRC}" alt="" draggable="false" ` +
+          `style="--tw:${tileW.toFixed(1)}px;left:${left.toFixed(1)}px;top:${top.toFixed(1)}px">`;
+      }
     }
     host.innerHTML = html;
   }
