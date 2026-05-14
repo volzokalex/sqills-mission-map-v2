@@ -1014,7 +1014,20 @@
        moving i+1 → screen shifts (+halfW, +halfH)
        moving j+1 → screen shifts (-halfW, +halfH)
      Render order: by depth (i+j) ascending, so the closest tiles paint last. */
-  const TERRAIN_TILE_SRC      = 'assets/terrain/tile.png?v=1';
+  // Zones: pick a tile sprite based on the iso row's nearest mission index.
+  // Mission n is centred at screen y ≈ ISLAND_TOP_OFFSET + n × ISLAND_PITCH.
+  const TERRAIN_ZONES = [
+    { from: 0, to: 4,        src: 'assets/terrain/tile-light.png?v=1' },
+    { from: 4, to: 8,        src: 'assets/terrain/tile-dark.png?v=1'  },
+    { from: 8, to: Infinity, src: 'assets/terrain/tile-light.png?v=1' }
+  ];
+  function terrainSpriteForY(cy) {
+    const idx = Math.max(0, Math.round((cy - ISLAND_TOP_OFFSET) / ISLAND_PITCH));
+    for (const z of TERRAIN_ZONES) {
+      if (idx >= z.from && idx < z.to) return z.src;
+    }
+    return TERRAIN_ZONES[TERRAIN_ZONES.length - 1].src;
+  }
   const TERRAIN_TILE_PCT      = 0.80;    // tile width = 80% of app width
   const TERRAIN_IMG_ASPECT    = 621 / 768; // PNG height / width
   const TERRAIN_DIAMOND_RATIO = 0.50;    // diamond height / diamond width (2:1 iso)
@@ -1062,7 +1075,7 @@
         if (left > appW + imgHalfW) continue;
         if (top + tileH < 0) continue;
         if (top > mapH + tileH) continue;
-        tiles.push({ sum, left, top });
+        tiles.push({ sum, left, top, cy });
       }
     }
     // Painter's order: shallower depth first (back), deepest last (front).
@@ -1070,8 +1083,9 @@
 
     let html = '';
     for (const t of tiles) {
+      const src = terrainSpriteForY(t.cy);
       html +=
-        `<img class="terrain-tile" src="${TERRAIN_TILE_SRC}" alt="" draggable="false" ` +
+        `<img class="terrain-tile" src="${src}" alt="" draggable="false" ` +
         `style="--tw:${tileW.toFixed(1)}px;left:${t.left.toFixed(1)}px;top:${t.top.toFixed(1)}px">`;
     }
     host.innerHTML = html;
