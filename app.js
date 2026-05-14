@@ -993,6 +993,49 @@
   }
   window.addEventListener('scroll', onScroll, { passive: true });
 
+  /* ---------- Iso voxel-terrain tiling ----------
+     Stacks N copies of the iso terrain tile vertically inside .terrain-layer
+     to cover the full map height. Each tile renders at full app width with
+     auto height (preserves the asset's square aspect). Consecutive tiles
+     overlap by TERRAIN_OVERLAP so the cliff face of one is hidden behind
+     the back-point of the next — gives continuous iso landscape.
+
+     DOM order = painter's order: the top-most tile is the first child,
+     the bottom-most tile is the last. The browser paints them in DOM
+     order, so each lower tile is drawn ON TOP of the previous one, which
+     is exactly what we want for iso depth (front-tiles cover back-tiles). */
+  const TERRAIN_TILE_SRC = 'assets/terrain/tile.png?v=1';
+  const TERRAIN_ASPECT   = 1.0;     // source PNG is approximately square
+  const TERRAIN_OVERLAP  = 0.14;    // 14% of tile height — hides the cliff seam
+
+  function injectTerrain() {
+    const host = document.getElementById('terrainLayer');
+    if (!host) return;
+    const parallax = document.querySelector('.parallax');
+    const w = (parallax && parallax.offsetWidth) || 430;
+    const tileH = w * TERRAIN_ASPECT;
+    const step  = tileH * (1 - TERRAIN_OVERLAP);
+    const mapH  = (mapEl && mapEl.offsetHeight) || 2000;
+    const count = Math.max(1, Math.ceil(mapH / step) + 1);
+    let html = '';
+    for (let i = 0; i < count; i++) {
+      const top = (i * step).toFixed(2);
+      html += `<img class="terrain-tile" src="${TERRAIN_TILE_SRC}" alt="" draggable="false" style="top:${top}px">`;
+    }
+    host.innerHTML = html;
+  }
+  // Two rAFs so the first renderMap() has set mapEl.offsetHeight by the time
+  // we measure. Re-run on resize so a viewport change keeps coverage.
+  requestAnimationFrame(() => requestAnimationFrame(injectTerrain));
+  let terrainResizeFrame = null;
+  window.addEventListener('resize', () => {
+    if (terrainResizeFrame) return;
+    terrainResizeFrame = requestAnimationFrame(() => {
+      terrainResizeFrame = null;
+      injectTerrain();
+    });
+  }, { passive: true });
+
   /* ---------- Bootstrap ---------- */
   renderHeader();
   renderEditor();

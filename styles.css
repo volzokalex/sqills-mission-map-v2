@@ -228,6 +228,25 @@ input { font: inherit; color: inherit; }
    Kept as a noop in case other rules reference it. */
 .sky { display: none; }
 .cloud-defs { position: absolute; }
+/* Iso-tile terrain layer — sits under the cloud parallax + islands. */
+.terrain-layer {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+.terrain-tile {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+  /* Pixel-art preservation for the voxel asset. */
+  image-rendering: pixelated;
+  image-rendering: -webkit-optimize-contrast;
+}
 .cloud-layer {
   position: absolute;
   top: 0; left: 0; right: 0;
