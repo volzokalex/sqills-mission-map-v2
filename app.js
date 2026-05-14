@@ -1090,17 +1090,16 @@
     }
     host.innerHTML = html;
   }
-  // Two rAFs so the first renderMap() has set mapEl.offsetHeight by the time
-  // we measure. Re-run on resize so a viewport change keeps coverage.
-  requestAnimationFrame(() => requestAnimationFrame(injectTerrain));
-  let terrainResizeFrame = null;
-  window.addEventListener('resize', () => {
-    if (terrainResizeFrame) return;
-    terrainResizeFrame = requestAnimationFrame(() => {
-      terrainResizeFrame = null;
-      injectTerrain();
-    });
-  }, { passive: true });
+  // Terrain background disabled — re-enable by uncommenting these.
+  // requestAnimationFrame(() => requestAnimationFrame(injectTerrain));
+  // let terrainResizeFrame = null;
+  // window.addEventListener('resize', () => {
+  //   if (terrainResizeFrame) return;
+  //   terrainResizeFrame = requestAnimationFrame(() => {
+  //     terrainResizeFrame = null;
+  //     injectTerrain();
+  //   });
+  // }, { passive: true });
 
   /* ---------- Bootstrap ---------- */
   renderHeader();
