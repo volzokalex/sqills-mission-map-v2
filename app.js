@@ -948,9 +948,10 @@
     layerEl.innerHTML = html;
   }
 
-  spawnCloudLayer(layers.far,  cloudLayerConfig.far,  111);
-  spawnCloudLayer(layers.mid,  cloudLayerConfig.mid,  222);
-  spawnCloudLayer(layers.near, cloudLayerConfig.near, 333);
+  // Cloud parallax disabled — re-enable by uncommenting the three calls.
+  // spawnCloudLayer(layers.far,  cloudLayerConfig.far,  111);
+  // spawnCloudLayer(layers.mid,  cloudLayerConfig.mid,  222);
+  // spawnCloudLayer(layers.near, cloudLayerConfig.near, 333);
 
   let parallaxFrame = null;
   let lastScrollY = window.scrollY;
