@@ -901,9 +901,9 @@
   const speeds = { far: 0.05, mid: 0.30, near: 0.55 };
   // Width ranges scaled for tall steam wisps (≈1:2.2 aspect).
   const cloudLayerConfig = {
-    far:  { count: 100, wMin: 28,  wMax: 60,  oMin: 0.35, oMax: 0.55 },
-    mid:  { count: 100, wMin: 55,  wMax: 100, oMin: 0.50, oMax: 0.75 },
-    near: { count: 100, wMin: 85,  wMax: 160, oMin: 0.65, oMax: 0.90 }
+    far:  { count: 100, wMin: 14, wMax: 30, oMin: 0.35, oMax: 0.55 },
+    mid:  { count: 100, wMin: 28, wMax: 50, oMin: 0.50, oMax: 0.75 },
+    near: { count: 100, wMin: 43, wMax: 80, oMin: 0.65, oMax: 0.90 }
   };
   const CLOUD_SRCS = [
     'assets/clouds/steam-1.png?v=2',
