@@ -985,11 +985,10 @@
         el.style.filter = '';
       }
     }
-    // Terrain background — positive translate = layer lags down behind the
-    // page scroll, so it appears to move slower than the islands above.
-    if (terrainLayer) {
-      terrainLayer.style.transform = `translate3d(0, ${(y * TERRAIN_LAG).toFixed(2)}px, 0)`;
-    }
+    // Terrain parallax disabled — pedestal scrolls 1:1 with the page.
+    // if (terrainLayer) {
+    //   terrainLayer.style.transform = `translate3d(0, ${(y * TERRAIN_LAG).toFixed(2)}px, 0)`;
+    // }
     if (appliedBlur) {
       parallaxFrame = requestAnimationFrame(tickParallax);
     }
@@ -1100,8 +1099,9 @@
     const tileW  = appW * 0.77;                // ~30% smaller than viewport
     const diamondCenterInImg = tileW * 0.25;    // 2:1 iso → diamond half-height
     const missionCenterY = ISLAND_TOP_OFFSET + 0 * ISLAND_PITCH + ISLAND_SIZE / 2;
+    const TILE_Y_OFFSET = 40;                   // shift pedestal down by Npx
     const left = (appW / 2) - (tileW / 2);
-    const top  = missionCenterY - diamondCenterInImg;
+    const top  = missionCenterY - diamondCenterInImg + TILE_Y_OFFSET;
     host.innerHTML =
       `<img class="terrain-tile" src="assets/terrain/blackland.png?v=1" ` +
       `alt="" draggable="false" ` +
