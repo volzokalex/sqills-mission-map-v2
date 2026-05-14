@@ -290,15 +290,15 @@
       }
       const centerDx = (minDx + maxDx) / 2;
       // Y stretch by cluster size:
-      //   3-cluster: middle anchored, top/bottom +30% from middle (was 20%)
-      //     top 0 → -0.3, middle 1 → 1.0, bottom 2 → 2.3
+      //   3-cluster: middle anchored, top/bottom +40% from middle (was 30%)
+      //     top 0 → -0.4, middle 1 → 1.0, bottom 2 → 2.4
       //   2-cluster: both missions move 10% apart
       //     top 0 → -0.05, bottom 1 → 1.05
       //   other sizes: no stretch.
       const stretchY3 = (size === 3);
       const stretchY2 = (size === 2);
-      const topDyOffset    = stretchY3 ? -0.3 : (stretchY2 ? -0.05 : 0);
-      const bottomDyOffset = stretchY3 ?  2.3 : (stretchY2 ?  1.05 : maxDySum);
+      const topDyOffset    = stretchY3 ? -0.4 : (stretchY2 ? -0.05 : 0);
+      const bottomDyOffset = stretchY3 ?  2.4 : (stretchY2 ?  1.05 : maxDySum);
       for (let n = 0; n < size; n++) {
         const missionIdx = group.missionIds[n];
         const p          = pattern[n];
@@ -306,8 +306,8 @@
         const dySumRaw   = p.i + p.j;
         let effectiveDy;
         if (stretchY3) {
-          if (dySumRaw === 0)      effectiveDy = -0.3;
-          else if (dySumRaw === 2) effectiveDy =  2.3;
+          if (dySumRaw === 0)      effectiveDy = -0.4;
+          else if (dySumRaw === 2) effectiveDy =  2.4;
           else                     effectiveDy =  1.0;
         } else if (stretchY2) {
           effectiveDy = (dySumRaw === 0) ? -0.05 : 1.05;
