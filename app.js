@@ -20,7 +20,9 @@
   // stations on top have visible breathing room between them.
   const TERRAIN_TILE_PCT = 0.43;     // pedestal width as fraction of viewport
   const ISO_STEP_X_RATIO = 0.55;     // halfW = pedestalW × ratio  (≈ pedestal half-width)
-  const ISO_STEP_Y_RATIO = 0.65;     // halfH = pedestalW × ratio  (looser than 2:1 iso for breathing)
+  const ISO_STEP_Y_RATIO = 0.80;     // halfH = pedestalW × ratio  — slightly > pedestal height
+                                     // so back-row pedestal floats above the front pair with
+                                     // visible canvas between them, matching reference comp
   const ALPHA_CROP_THRESHOLD = 8;    // alpha below this counts as transparent for auto-crop
   const MAX_PNG_SIDE = 512;          // resize cap before storing
   const STATES = ['available', 'current', 'done', 'locked'];
