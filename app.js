@@ -906,9 +906,9 @@
     near: { count: 100, wMin: 85,  wMax: 160, oMin: 0.65, oMax: 0.90 }
   };
   const CLOUD_SRCS = [
-    'assets/clouds/steam-1.png',
-    'assets/clouds/steam-2.png',
-    'assets/clouds/steam-3.png'
+    'assets/clouds/steam-1.png?v=2',
+    'assets/clouds/steam-2.png?v=2',
+    'assets/clouds/steam-3.png?v=2'
   ];
 
   // Seeded RNG so cloud scatter is stable across reloads.
