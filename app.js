@@ -1090,16 +1090,32 @@
     }
     host.innerHTML = html;
   }
-  // Terrain background disabled — re-enable by uncommenting these.
-  // requestAnimationFrame(() => requestAnimationFrame(injectTerrain));
-  // let terrainResizeFrame = null;
-  // window.addEventListener('resize', () => {
-  //   if (terrainResizeFrame) return;
-  //   terrainResizeFrame = requestAnimationFrame(() => {
-  //     terrainResizeFrame = null;
-  //     injectTerrain();
-  //   });
-  // }, { passive: true });
+  // Full iso-tile background is off; we only place a single "pedestal"
+  // under mission #1 (index 0) using the blackland asset.
+  function placePedestalMission0() {
+    const host = document.getElementById('terrainLayer');
+    if (!host || missions.length === 0) return;
+    const parallax = document.querySelector('.parallax');
+    const appW   = (parallax && parallax.offsetWidth) || 430;
+    const tileW  = appW * 1.10;                // slightly wider than viewport
+    const diamondCenterInImg = tileW * 0.25;    // 2:1 iso → diamond half-height
+    const missionCenterY = ISLAND_TOP_OFFSET + 0 * ISLAND_PITCH + ISLAND_SIZE / 2;
+    const left = (appW / 2) - (tileW / 2);
+    const top  = missionCenterY - diamondCenterInImg;
+    host.innerHTML =
+      `<img class="terrain-tile" src="assets/terrain/blackland.png?v=1" ` +
+      `alt="" draggable="false" ` +
+      `style="--tw:${tileW.toFixed(1)}px;left:${left.toFixed(1)}px;top:${top.toFixed(1)}px">`;
+  }
+  requestAnimationFrame(() => requestAnimationFrame(placePedestalMission0));
+  let pedestalResizeFrame = null;
+  window.addEventListener('resize', () => {
+    if (pedestalResizeFrame) return;
+    pedestalResizeFrame = requestAnimationFrame(() => {
+      pedestalResizeFrame = null;
+      placePedestalMission0();
+    });
+  }, { passive: true });
 
   /* ---------- Bootstrap ---------- */
   renderHeader();
