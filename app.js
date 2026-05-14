@@ -838,6 +838,36 @@
     });
   });
 
+  /* ---------- Editor toggles: hide titles / hide connections ----------
+     State persists in localStorage so a reload keeps the chosen view. */
+  const TOGGLE_KEYS = {
+    hideTitles:      'missionMap.hideTitles',
+    hideConnections: 'missionMap.hideConnections'
+  };
+  const TOGGLE_CLASSES = {
+    hideTitles:      'hide-titles',
+    hideConnections: 'hide-connections'
+  };
+  function applyToggle(key, on) {
+    document.body.classList.toggle(TOGGLE_CLASSES[key], on);
+    try { localStorage.setItem(TOGGLE_KEYS[key], on ? '1' : '0'); } catch {}
+  }
+  function readToggle(key) {
+    try { return localStorage.getItem(TOGGLE_KEYS[key]) === '1'; } catch { return false; }
+  }
+  const hideTitlesEl      = document.getElementById('toggleHideTitles');
+  const hideConnectionsEl = document.getElementById('toggleHideConnections');
+  if (hideTitlesEl) {
+    hideTitlesEl.checked = readToggle('hideTitles');
+    applyToggle('hideTitles', hideTitlesEl.checked);
+    hideTitlesEl.addEventListener('change', () => applyToggle('hideTitles', hideTitlesEl.checked));
+  }
+  if (hideConnectionsEl) {
+    hideConnectionsEl.checked = readToggle('hideConnections');
+    applyToggle('hideConnections', hideConnectionsEl.checked);
+    hideConnectionsEl.addEventListener('change', () => applyToggle('hideConnections', hideConnectionsEl.checked));
+  }
+
   resetAllBtn.addEventListener('click', () => {
     if (missions.length === 0) return;
     if (!confirm('Delete all islands? This cannot be undone.')) return;
