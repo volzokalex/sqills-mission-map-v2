@@ -13,7 +13,7 @@
   const ISLAND_TOP_OFFSET = 24;      // top padding inside the map (px)
   const ISLAND_SIZE = 160;           // visual island size (px) — proportional 1.20× bump
   // Cluster (iso-group) layout constants — replaces vertical-pitch + sine zig-zag.
-  const GROUP_GAP        = 144;      // px gap between iso clusters (was 120, +20%)
+  const GROUP_GAP        = 70;       // px gap between iso clusters (was 144, -50%)
   const CLUSTER_VIEWPORT_W = 430;    // baseline app width for percent conversion
   // Iso step is keyed to the PEDESTAL width (not station). Multipliers
   // tuned so pedestals share their diamond corners (tight iso) but the
