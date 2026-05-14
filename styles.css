@@ -272,8 +272,9 @@ input { font: inherit; color: inherit; }
   width: var(--w, 220px);
   height: auto;
   display: block;
-  /* --tx may include scaleX(-1) flip + slight rotation for chaos. */
-  transform: translateX(-50%) var(--tx, scale(1));
+  /* --rot rotates the sprite (e.g. 90° for horizontal-ribbon variants);
+     --tx may include scaleX(-1) flip for left/right chaos. */
+  transform: translateX(-50%) rotate(var(--rot, 0deg)) var(--tx, scale(1));
   pointer-events: none;
   image-rendering: pixelated;       /* preserve pixel-edges of the asset */
   image-rendering: -webkit-optimize-contrast;
