@@ -20,9 +20,7 @@
   // stations on top have visible breathing room between them.
   const TERRAIN_TILE_PCT = 0.43;     // pedestal width as fraction of viewport
   const ISO_STEP_X_RATIO = 0.55;     // halfW = pedestalW × ratio  (≈ pedestal half-width)
-  const ISO_STEP_Y_RATIO = 0.80;     // halfH = pedestalW × ratio  — slightly > pedestal height
-                                     // so back-row pedestal floats above the front pair with
-                                     // visible canvas between them, matching reference comp
+  const ISO_STEP_Y_RATIO = 0.60;     // halfH = pedestalW × ratio  — closer cluster
   const ALPHA_CROP_THRESHOLD = 8;    // alpha below this counts as transparent for auto-crop
   const MAX_PNG_SIDE = 512;          // resize cap before storing
   const STATES = ['available', 'current', 'done', 'locked'];
@@ -197,11 +195,19 @@
      group becomes 4 instead of 3+1. */
   const LAST_SCALE = 1.62;
 
-  const CLUSTER_PATTERNS = {
+  // Pattern A — central LEFT, top + bottom RIGHT (snake mirrors leftward).
+  const CLUSTER_PATTERNS_A = {
     1: [{ i: 0, j: 0 }],
-    2: [{ i: 0, j: 0 }, { i: 1, j: 0 }],                              // diagonal pair
-    3: [{ i: 0, j: 0 }, { i: 1, j: 0 }, { i: 1, j: 1 }],              // snake / zig-zag (3 depths)
-    4: [{ i: 0, j: 0 }, { i: 1, j: 0 }, { i: 0, j: 1 }, { i: 1, j: 1 }] // 2×2 iso square
+    2: [{ i: 0, j: 0 }, { i: 1, j: 0 }],
+    3: [{ i: 0, j: 0 }, { i: 0, j: 1 }, { i: 1, j: 1 }],
+    4: [{ i: 0, j: 0 }, { i: 1, j: 0 }, { i: 0, j: 1 }, { i: 1, j: 1 }]
+  };
+  // Pattern B — central RIGHT, top + bottom LEFT (snake mirrors rightward).
+  const CLUSTER_PATTERNS_B = {
+    1: [{ i: 0, j: 0 }],
+    2: [{ i: 0, j: 0 }, { i: 1, j: 0 }],
+    3: [{ i: 0, j: 0 }, { i: 1, j: 0 }, { i: 1, j: 1 }],
+    4: [{ i: 0, j: 0 }, { i: 1, j: 0 }, { i: 0, j: 1 }, { i: 1, j: 1 }]
   };
 
   function planGroups(count) {
@@ -252,9 +258,13 @@
     const positions   = new Array(count);
     const groups      = planGroups(count);
     let groupTopY     = ISLAND_TOP_OFFSET;
-    for (const group of groups) {
+    for (let g = 0; g < groups.length; g++) {
+      const group = groups[g];
       const size    = group.missionIds.length;
-      const pattern = CLUSTER_PATTERNS[size] || CLUSTER_PATTERNS[1];
+      // Alternate patterns A/B per group so successive 3-clusters mirror
+      // each other. Group 0 = A (central LEFT), group 1 = B (central RIGHT).
+      const patterns = (g % 2 === 0) ? CLUSTER_PATTERNS_A : CLUSTER_PATTERNS_B;
+      const pattern  = patterns[size] || patterns[1];
       let minDx = Infinity, maxDx = -Infinity, maxDySum = 0;
       for (const p of pattern) {
         const dx = p.i - p.j;
