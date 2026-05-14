@@ -899,12 +899,17 @@
     near: document.querySelector('.cloud-layer--near')
   };
   const speeds = { far: 0.05, mid: 0.30, near: 0.55 };
+  // Width ranges scaled for tall steam wisps (≈1:2.2 aspect).
   const cloudLayerConfig = {
-    far:  { count: 40, wMin: 36,  wMax: 78,  oMin: 0.32, oMax: 0.55 },
-    mid:  { count: 35, wMin: 70,  wMax: 130, oMin: 0.50, oMax: 0.75 },
-    near: { count: 25, wMin: 115, wMax: 200, oMin: 0.65, oMax: 0.90 }
+    far:  { count: 40, wMin: 28,  wMax: 60,  oMin: 0.35, oMax: 0.55 },
+    mid:  { count: 35, wMin: 55,  wMax: 100, oMin: 0.50, oMax: 0.75 },
+    near: { count: 25, wMin: 85,  wMax: 160, oMin: 0.65, oMax: 0.90 }
   };
-  const CLOUD_SRC = 'assets/clouds/voxel-cloud.png';
+  const CLOUD_SRCS = [
+    'assets/clouds/steam-1.png',
+    'assets/clouds/steam-2.png',
+    'assets/clouds/steam-3.png'
+  ];
 
   // Seeded RNG so cloud scatter is stable across reloads.
   function makeRng(seed) {
@@ -928,22 +933,25 @@
       const w = wMin + rng() * (wMax - wMin);
       const o = oMin + rng() * (oMax - oMin);
       const flip = rng() < 0.5 ? 'scaleX(-1)' : 'scaleX(1)';
+      const src = CLOUD_SRCS[Math.floor(rng() * CLOUD_SRCS.length)];
+      // data-max-o = peak opacity. Current opacity starts at 0 and is
+      // driven each frame by tickParallax (distance from viewport centre).
       html +=
-        `<img class="cloud" src="${CLOUD_SRC}" alt="" draggable="false" style="` +
+        `<img class="cloud" src="${src}" alt="" draggable="false" data-max-o="${o.toFixed(3)}" style="` +
         `--x:${x.toFixed(2)}%;` +
         `--y:${y.toFixed(2)}%;` +
         `--w:${w.toFixed(0)}px;` +
-        `--o:${o.toFixed(2)};` +
+        `--o:0;` +
         `--tx:${flip}` +
         `">`;
     }
     layerEl.innerHTML = html;
   }
 
-  // Clouds disabled — re-enable by uncommenting the three calls.
-  // spawnCloudLayer(layers.far,  cloudLayerConfig.far,  111);
-  // spawnCloudLayer(layers.mid,  cloudLayerConfig.mid,  222);
-  // spawnCloudLayer(layers.near, cloudLayerConfig.near, 333);
+  spawnCloudLayer(layers.far,  cloudLayerConfig.far,  111);
+  spawnCloudLayer(layers.mid,  cloudLayerConfig.mid,  222);
+  spawnCloudLayer(layers.near, cloudLayerConfig.near, 333);
+  let allClouds = document.querySelectorAll('.cloud');
 
   let parallaxFrame = null;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -957,11 +965,28 @@
       if (!el) continue;
       el.style.transform = `translate3d(0, ${(-y * speeds[key]).toFixed(2)}px, 0)`;
     }
+    // Fade every cloud by distance from viewport centre — clouds appear
+    // as they approach the centre line and dissolve as they leave.
+    const vh = window.innerHeight;
+    const vCenter = vh / 2;
+    const fadeWindow = vh * 0.65;
+    allClouds.forEach(c => {
+      const r = c.getBoundingClientRect();
+      const cy = r.top + r.height / 2;
+      const dist = Math.abs(cy - vCenter);
+      const t = Math.min(1, dist / fadeWindow);
+      const fade = 1 - t * t * (3 - 2 * t);  // smoothstep
+      const maxO = parseFloat(c.dataset.maxO) || 0.7;
+      c.style.opacity = (maxO * fade).toFixed(3);
+    });
   }
   function onScroll() {
     if (parallaxFrame === null) parallaxFrame = requestAnimationFrame(tickParallax);
   }
   window.addEventListener('scroll', onScroll, { passive: true });
+  // Run once at boot so clouds get their initial opacity (instead of all
+  // sitting at --o:0 until the user first scrolls).
+  requestAnimationFrame(tickParallax);
 
   /* ---------- Bootstrap ---------- */
   renderHeader();
