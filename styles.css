@@ -277,6 +277,9 @@ input { font: inherit; color: inherit; }
   pointer-events: none;
   image-rendering: pixelated;       /* preserve pixel-edges of the asset */
   image-rendering: -webkit-optimize-contrast;
+  /* Dissolves the white background of JPEG cloud sprites into the cream
+     canvas (white * cream = cream). Transparent PNGs are unaffected. */
+  mix-blend-mode: multiply;
 }
 /* Per-cloud opacity comes from inline `--o`. Voxel asset already reads as
    a desaturated whitish block — no extra filter, so the orange pixel

@@ -908,7 +908,9 @@
   const CLOUD_SRCS = [
     'assets/clouds/steam-1.png?v=2',
     'assets/clouds/steam-2.png?v=2',
-    'assets/clouds/steam-3.png?v=2'
+    'assets/clouds/steam-3.png?v=2',
+    'assets/clouds/steam-4.jpg?v=2',
+    'assets/clouds/steam-5.jpg?v=2'
   ];
 
   // Seeded RNG so cloud scatter is stable across reloads.
@@ -951,16 +953,38 @@
   spawnCloudLayer(layers.near, cloudLayerConfig.near, 333);
 
   let parallaxFrame = null;
+  let lastScrollY = window.scrollY;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const MOTION_BLUR_GAIN = 0.10;   // px of blur per px of effective frame velocity
+  const MOTION_BLUR_MAX  = 6;      // hard cap to avoid mush at fast flings
 
   function tickParallax() {
     parallaxFrame = null;
     if (prefersReducedMotion) return;
     const y = window.scrollY;
+    const delta = y - lastScrollY;
+    lastScrollY = y;
+    let appliedBlur = false;
     for (const key of Object.keys(layers)) {
       const el = layers[key];
       if (!el) continue;
-      el.style.transform = `translate3d(0, ${(-y * speeds[key]).toFixed(2)}px, 0)`;
+      const speed = speeds[key];
+      el.style.transform = `translate3d(0, ${(-y * speed).toFixed(2)}px, 0)`;
+      // Effective frame-to-frame motion of clouds in this layer:
+      // page scrolls by `delta`, layer translates by `delta * speed`,
+      // so cloud's screen velocity ≈ |delta| × (1 + speed).
+      const blur = Math.min(MOTION_BLUR_MAX, Math.abs(delta) * (1 + speed) * MOTION_BLUR_GAIN);
+      if (blur > 0.15) {
+        el.style.filter = `blur(${blur.toFixed(2)}px)`;
+        appliedBlur = true;
+      } else {
+        el.style.filter = '';
+      }
+    }
+    // If blur was applied, schedule another frame so it can decay to 0
+    // once scrolling stops (next tick will see delta≈0 and clear filter).
+    if (appliedBlur) {
+      parallaxFrame = requestAnimationFrame(tickParallax);
     }
   }
   function onScroll() {
