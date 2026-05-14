@@ -1150,7 +1150,7 @@
     }
     return TERRAIN_ZONES[TERRAIN_ZONES.length - 1].src;
   }
-  const TERRAIN_TILE_PCT      = 0.80;    // tile width = 80% of app width
+  // (TERRAIN_TILE_PCT lives in the top-level constants block now.)
   const TERRAIN_IMG_ASPECT    = 621 / 768; // PNG height / width
   const TERRAIN_DIAMOND_RATIO = 0.50;    // diamond height / diamond width (2:1 iso)
   // Spacing multipliers: 1.0 = diamond vertices just touch; >1 = visible
