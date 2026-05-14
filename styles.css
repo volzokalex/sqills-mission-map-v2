@@ -245,9 +245,8 @@ input { font: inherit; color: inherit; }
   pointer-events: none;
   image-rendering: pixelated;
   image-rendering: -webkit-optimize-contrast;
-  /* Drop-shadow follows the iso silhouette — light from upper-left,
-     shadow falls down-right (matches the asset's iso shading). */
-  filter: drop-shadow(6px 8px 1px rgba(24, 19, 12, 0.60));
+  /* Drop-shadow follows the iso silhouette — straight down, soft. */
+  filter: drop-shadow(0 8px 12px rgba(24, 19, 12, 0.45));
 }
 .cloud-layer {
   position: absolute;

@@ -325,6 +325,10 @@
       if (g === 0 && size === 1 && !group.isFinal && groups.length > 1) {
         groupTopY += FIRST_GROUP_EXTRA_GAP;
       }
+      // Same extra breathing room before the final solo mission.
+      if (g + 1 < groups.length && groups[g + 1].isFinal) {
+        groupTopY += FIRST_GROUP_EXTRA_GAP;
+      }
     }
     const totalHeight = groupTopY - GROUP_GAP;
     return { positions, totalHeight };
