@@ -200,7 +200,7 @@
   const CLUSTER_PATTERNS = {
     1: [{ i: 0, j: 0 }],
     2: [{ i: 0, j: 0 }, { i: 1, j: 0 }],                              // diagonal pair
-    3: [{ i: 0, j: 0 }, { i: 1, j: 0 }, { i: 0, j: 1 }],              // iso triangle
+    3: [{ i: 0, j: 0 }, { i: 1, j: 0 }, { i: 1, j: 1 }],              // snake / zig-zag (3 depths)
     4: [{ i: 0, j: 0 }, { i: 1, j: 0 }, { i: 0, j: 1 }, { i: 1, j: 1 }] // 2×2 iso square
   };
 
