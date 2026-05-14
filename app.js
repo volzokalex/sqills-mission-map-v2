@@ -14,6 +14,7 @@
   const ISLAND_SIZE = 160;           // visual island size (px) — proportional 1.20× bump
   // Cluster (iso-group) layout constants — replaces vertical-pitch + sine zig-zag.
   const GROUP_GAP        = 70;       // px gap between iso clusters (was 144, -50%)
+  const FIRST_GROUP_EXTRA_GAP = 32;  // extra space after the first (solo) mission
   const CLUSTER_VIEWPORT_W = 430;    // baseline app width for percent conversion
   // Iso step is keyed to the PEDESTAL width (not station). Multipliers
   // tuned so pedestals share their diamond corners (tight iso) but the
@@ -320,6 +321,10 @@
       const finalIslandH = group.isFinal ? ISLAND_SIZE * LAST_SCALE : ISLAND_SIZE;
       // Advance by full cluster vertical span (incl. stretch top offset) + station + gap.
       groupTopY += (bottomDyOffset - topDyOffset) * halfH + finalIslandH + GROUP_GAP;
+      // Extra breathing room after the first (solo, non-final) mission.
+      if (g === 0 && size === 1 && !group.isFinal && groups.length > 1) {
+        groupTopY += FIRST_GROUP_EXTRA_GAP;
+      }
     }
     const totalHeight = groupTopY - GROUP_GAP;
     return { positions, totalHeight };
