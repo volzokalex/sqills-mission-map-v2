@@ -262,8 +262,8 @@
       const group = groups[g];
       const size    = group.missionIds.length;
       // Alternate patterns A/B per group so successive 3-clusters mirror
-      // each other. Group 0 = A (central LEFT), group 1 = B (central RIGHT).
-      const patterns = (g % 2 === 0) ? CLUSTER_PATTERNS_A : CLUSTER_PATTERNS_B;
+      // each other. Group 0 = B (central RIGHT), group 1 = A (central LEFT).
+      const patterns = (g % 2 === 0) ? CLUSTER_PATTERNS_B : CLUSTER_PATTERNS_A;
       const pattern  = patterns[size] || patterns[1];
       let minDx = Infinity, maxDx = -Infinity, maxDySum = 0;
       for (const p of pattern) {
