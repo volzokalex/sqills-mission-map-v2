@@ -10,10 +10,12 @@
   /* ---------- Constants ---------- */
   const STORAGE_KEY = 'missionMap.missions';
   const PRESS_NAV_DELAY_MS = 280;
-  const ISLAND_PITCH = 230;          // vertical distance between island centers (px)
   const ISLAND_TOP_OFFSET = 24;      // top padding inside the map (px)
-  const ISLAND_SIZE = 190;           // visual island size (px)
-  const ISLAND_X_AMPLITUDE = 18;     // zig-zag half-amplitude as %  (centered at 50%)
+  const ISLAND_SIZE = 133;           // visual island size (px) — was 190, shrunk 0.70× for cluster fit
+  // Cluster (iso-group) layout constants — replaces vertical-pitch + sine zig-zag.
+  const GROUP_GAP        = 120;      // px gap between iso clusters
+  const ISO_DIAMOND_RAT  = 0.5;      // halfH = halfW × this (2:1 iso)
+  const CLUSTER_VIEWPORT_W = 430;    // baseline app width for percent conversion
   const ALPHA_CROP_THRESHOLD = 8;    // alpha below this counts as transparent for auto-crop
   const MAX_PNG_SIDE = 512;          // resize cap before storing
   const STATES = ['available', 'current', 'done', 'locked'];
@@ -182,20 +184,105 @@
   function uid() {
     return 'm_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
   }
+  /* ---------- Cluster layout (iso groups of 3 + final solo) ----------
+     Missions are grouped: groups of 3 by default, final mission always solo.
+     Group-of-1 forbidden elsewhere — if remainder would be 1, last regular
+     group becomes 4 instead of 3+1. */
+  const LAST_SCALE = 1.62;
+
+  const CLUSTER_PATTERNS = {
+    1: [{ i: 0, j: 0 }],
+    2: [{ i: 0, j: 0 }, { i: 1, j: 0 }],                              // diagonal pair
+    3: [{ i: 0, j: 0 }, { i: 1, j: 0 }, { i: 0, j: 1 }],              // iso triangle
+    4: [{ i: 0, j: 0 }, { i: 1, j: 0 }, { i: 0, j: 1 }, { i: 1, j: 1 }] // 2×2 iso square
+  };
+
+  function planGroups(count) {
+    if (count <= 0) return [];
+    if (count === 1) return [{ missionIds: [0], isFinal: true }];
+    const groups = [];
+    const finalIdx = count - 1;
+    let idx = 0;
+    let rem = finalIdx; // non-final missions still to place
+    while (rem > 0) {
+      if (rem === 1) {
+        const last = groups[groups.length - 1];
+        if (last && last.missionIds.length === 3) {
+          last.missionIds.push(idx);
+        } else {
+          groups.push({ missionIds: [idx], isFinal: false });
+        }
+        idx++; rem = 0;
+      } else if (rem === 2) {
+        groups.push({ missionIds: [idx, idx + 1], isFinal: false });
+        idx += 2; rem -= 2;
+      } else if (rem === 4) {
+        groups.push({ missionIds: [idx, idx + 1, idx + 2, idx + 3], isFinal: false });
+        idx += 4; rem -= 4;
+      } else {
+        groups.push({ missionIds: [idx, idx + 1, idx + 2], isFinal: false });
+        idx += 3; rem -= 3;
+      }
+    }
+    groups.push({ missionIds: [finalIdx], isFinal: true });
+    return groups;
+  }
+
+  let _layoutCache = null;
+  let _layoutCacheCount = -1;
+  function ensureLayout(count) {
+    if (count === _layoutCacheCount && _layoutCache) return _layoutCache;
+    _layoutCacheCount = count;
+    _layoutCache = computeMissionLayout(count);
+    return _layoutCache;
+  }
+  function computeMissionLayout(count) {
+    if (!count) return { positions: [], totalHeight: 0 };
+    const halfW       = ISLAND_SIZE / 2;                   // iso step (px) — uses station size as unit
+    const halfH       = halfW * ISO_DIAMOND_RAT;           // iso half-height
+    const halfW_pct   = (halfW / CLUSTER_VIEWPORT_W) * 100;
+    const positions   = new Array(count);
+    const groups      = planGroups(count);
+    let groupTopY     = ISLAND_TOP_OFFSET;
+    for (const group of groups) {
+      const size    = group.missionIds.length;
+      const pattern = CLUSTER_PATTERNS[size] || CLUSTER_PATTERNS[1];
+      let minDx = Infinity, maxDx = -Infinity, maxDySum = 0;
+      for (const p of pattern) {
+        const dx = p.i - p.j;
+        const dy = p.i + p.j;
+        if (dx < minDx) minDx = dx;
+        if (dx > maxDx) maxDx = dx;
+        if (dy > maxDySum) maxDySum = dy;
+      }
+      const centerDx = (minDx + maxDx) / 2;
+      for (let n = 0; n < size; n++) {
+        const missionIdx = group.missionIds[n];
+        const p          = pattern[n];
+        const dxUnits    = (p.i - p.j) - centerDx;
+        const dySum      = p.i + p.j;
+        const xPct = 50 + dxUnits * halfW_pct;
+        const y    = groupTopY + dySum * halfH;
+        positions[missionIdx] = { xPct, y, isFinal: group.isFinal };
+      }
+      const finalIslandH = group.isFinal ? ISLAND_SIZE * LAST_SCALE : ISLAND_SIZE;
+      groupTopY += maxDySum * halfH + finalIslandH + GROUP_GAP;
+    }
+    const totalHeight = groupTopY - GROUP_GAP;
+    return { positions, totalHeight };
+  }
+
   function islandXPct(i, count) {
-    // Last mission is centered (50%); others follow the gentle sine zig-zag.
-    if (count !== undefined && i === count - 1) return 50;
-    return 50 + Math.sin((i * Math.PI) / 2) * ISLAND_X_AMPLITUDE;
+    const layout = ensureLayout(count === undefined ? missions.length : count);
+    return layout.positions[i] ? layout.positions[i].xPct : 50;
   }
   function islandY(i) {
-    return ISLAND_TOP_OFFSET + i * ISLAND_PITCH;
+    const layout = ensureLayout(missions.length);
+    return layout.positions[i] ? layout.positions[i].y : 0;
   }
-  // Last island is 30% bigger, so its slot needs extra bottom room.
-  const LAST_SCALE = 1.62;
   function mapHeight(count) {
     if (!count) return 0;
-    const lastBoost = count > 0 ? (ISLAND_SIZE * (LAST_SCALE - 1)) : 0;
-    return ISLAND_TOP_OFFSET + (count - 1) * ISLAND_PITCH + ISLAND_SIZE + lastBoost + 80;
+    return ensureLayout(count).totalHeight + 80;
   }
   function escapeHtml(str) {
     return String(str ?? '').replace(/[&<>"']/g, c => ({
@@ -1126,21 +1213,22 @@
     if (!host || missions.length === 0) return;
     const parallax = document.querySelector('.parallax');
     const appW   = (parallax && parallax.offsetWidth) || 430;
-    const tileW  = appW * 0.62;
-    const diamondCenterInImg = tileW * 0.25;
-    // Rule: tile sits VISUALLY beneath the station — same relative offset
-    // on every mission so the relationship reads identical map-wide.
-    const TILE_Y_OFFSET = 40;
+    const baseTileW   = appW * 0.43;            // shrunk to fit iso clusters
+    const TILE_Y_OFFSET = 28;                   // tile sits VISUALLY beneath station
     const count = missions.length;
+    const layout = ensureLayout(count);
     let html = '';
     for (let idx = 0; idx < count; idx++) {
-      // Match the mission's zig-zag X — islands drift between
-      // 50% ± ISLAND_X_AMPLITUDE; pedestals must follow them.
-      const missionCenterXPct = islandXPct(idx, count);
-      const missionCenterX = (missionCenterXPct / 100) * appW;
-      const missionCenterY = ISLAND_TOP_OFFSET + idx * ISLAND_PITCH + ISLAND_SIZE / 2;
+      const pos = layout.positions[idx];
+      if (!pos) continue;
+      const isFinal     = pos.isFinal;
+      const islandSize  = isFinal ? ISLAND_SIZE * LAST_SCALE : ISLAND_SIZE;
+      const tileW       = isFinal ? baseTileW * LAST_SCALE : baseTileW;
+      const diamondHalf = tileW * 0.25;
+      const missionCenterX = (pos.xPct / 100) * appW;
+      const missionCenterY = pos.y + islandSize / 2;
       const left = missionCenterX - tileW / 2;
-      const top  = missionCenterY - diamondCenterInImg + TILE_Y_OFFSET;
+      const top  = missionCenterY - diamondHalf + TILE_Y_OFFSET;
       html +=
         `<img class="terrain-tile" src="assets/terrain/blackland.png?v=1" ` +
         `alt="" draggable="false" ` +
