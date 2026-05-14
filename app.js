@@ -1015,7 +1015,7 @@
        moving j+1 → screen shifts (-halfW, +halfH)
      Render order: by depth (i+j) ascending, so the closest tiles paint last. */
   const TERRAIN_TILE_SRC      = 'assets/terrain/tile.png?v=1';
-  const TERRAIN_TILE_PCT      = 0.40;    // tile width = 40% of app width
+  const TERRAIN_TILE_PCT      = 0.80;    // tile width = 80% of app width
   const TERRAIN_IMG_ASPECT    = 621 / 768; // PNG height / width
   const TERRAIN_DIAMOND_RATIO = 0.50;    // diamond height / diamond width (2:1 iso)
   // Spacing multipliers: 1.0 = diamond vertices just touch; >1 = visible
