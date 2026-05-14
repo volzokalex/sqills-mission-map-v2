@@ -14,7 +14,7 @@
   const ISLAND_SIZE = 160;           // visual island size (px) — proportional 1.20× bump
   // Cluster (iso-group) layout constants — replaces vertical-pitch + sine zig-zag.
   const GROUP_GAP        = 70;       // px gap between iso clusters (was 144, -50%)
-  const FIRST_GROUP_EXTRA_GAP = 32;  // extra space after the first (solo) mission
+  const FIRST_GROUP_EXTRA_GAP = 64;  // extra space after the first (solo) mission
   const CLUSTER_VIEWPORT_W = 430;    // baseline app width for percent conversion
   // Iso step is keyed to the PEDESTAL width (not station). Multipliers
   // tuned so pedestals share their diamond corners (tight iso) but the
