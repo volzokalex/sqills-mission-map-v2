@@ -213,10 +213,17 @@
   function planGroups(count) {
     if (count <= 0) return [];
     if (count === 1) return [{ missionIds: [0], isFinal: true }];
+    // For 2..4 missions: only the final is solo, rest grouped by old rules.
+    // For 5+: BOTH first and final are solo (centered), middle gets 3-clusters.
     const groups = [];
     const finalIdx = count - 1;
-    let idx = 0;
-    let rem = finalIdx; // non-final missions still to place
+    let idx, rem;
+    if (count >= 5) {
+      groups.push({ missionIds: [0], isFinal: false });
+      idx = 1; rem = finalIdx - 1; // middle range [1 .. finalIdx-1]
+    } else {
+      idx = 0; rem = finalIdx;
+    }
     while (rem > 0) {
       if (rem === 1) {
         const last = groups[groups.length - 1];
@@ -258,12 +265,19 @@
     const positions   = new Array(count);
     const groups      = planGroups(count);
     let groupTopY     = ISLAND_TOP_OFFSET;
+    let triadIndex    = 0;
     for (let g = 0; g < groups.length; g++) {
       const group = groups[g];
       const size    = group.missionIds.length;
-      // Alternate patterns A/B per group so successive 3-clusters mirror
-      // each other. Group 0 = B (central RIGHT), group 1 = A (central LEFT).
-      const patterns = (g % 2 === 0) ? CLUSTER_PATTERNS_B : CLUSTER_PATTERNS_A;
+      // Alternate B/A only across 3-clusters (solo / pair / quad groups
+      // don't shift the cadence). First 3-cluster = B (central RIGHT).
+      let patterns;
+      if (size === 3) {
+        patterns = (triadIndex % 2 === 0) ? CLUSTER_PATTERNS_B : CLUSTER_PATTERNS_A;
+        triadIndex++;
+      } else {
+        patterns = CLUSTER_PATTERNS_A;
+      }
       const pattern  = patterns[size] || patterns[1];
       let minDx = Infinity, maxDx = -Infinity, maxDySum = 0;
       for (const p of pattern) {
