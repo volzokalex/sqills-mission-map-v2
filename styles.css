@@ -245,8 +245,9 @@ input { font: inherit; color: inherit; }
   pointer-events: none;
   image-rendering: pixelated;
   image-rendering: -webkit-optimize-contrast;
-  /* Drop-shadow follows the iso silhouette (cliff edges + steps). */
-  filter: drop-shadow(0 16px 8px rgba(24, 19, 12, 0.55));
+  /* Drop-shadow follows the iso silhouette — tight + close so the tile
+     reads as sitting on the canvas, not floating above it. */
+  filter: drop-shadow(0 8px 3px rgba(24, 19, 12, 0.60));
 }
 .cloud-layer {
   position: absolute;
