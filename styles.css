@@ -228,6 +228,15 @@ input { font: inherit; color: inherit; }
    Kept as a noop in case other rules reference it. */
 .sky { display: none; }
 .cloud-defs { position: absolute; }
+/* Procedural voxel-terrain backdrop — sits below all cloud layers. */
+.terrain-layer {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+.terrain-layer svg { width: 100%; height: 100%; display: block; }
 .cloud-layer {
   position: absolute;
   top: 0; left: 0; right: 0;

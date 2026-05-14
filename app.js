@@ -992,6 +992,112 @@
   }
   window.addEventListener('scroll', onScroll, { passive: true });
 
+  /* ---------- Procedural voxel terrain backdrop (experiment) ----------
+     Procedural isometric voxel platforms + orange circuit traces. Pure
+     SVG generated client-side, deterministic via seeded RNG, injected
+     into .terrain-layer below all cloud layers. Static — no parallax. */
+  const TERRAIN_PALETTE = {
+    bg:     '#FAF2DF',
+    top:    '#F5EBD8',
+    front:  '#ECE0C6',
+    side:   '#DAC9A8',
+    wire:   '#E6822A'
+  };
+
+  function buildVoxelTerrain(width, height, seed) {
+    const rng = makeRng(seed);
+    const cubes = [];
+    const wires = [];
+
+    function pushCube(cx, cy, sw, sh, h) {
+      const top   = `${cx},${cy-sh} ${cx+sw},${cy} ${cx},${cy+sh} ${cx-sw},${cy}`;
+      const front = `${cx-sw},${cy} ${cx},${cy+sh} ${cx},${cy+sh+h} ${cx-sw},${cy+h}`;
+      const right = `${cx+sw},${cy} ${cx},${cy+sh} ${cx},${cy+sh+h} ${cx+sw},${cy+h}`;
+      cubes.push(`<polygon points="${front}" fill="${TERRAIN_PALETTE.front}"/>`);
+      cubes.push(`<polygon points="${right}" fill="${TERRAIN_PALETTE.side}"/>`);
+      cubes.push(`<polygon points="${top}" fill="${TERRAIN_PALETTE.top}"/>`);
+    }
+
+    // Place platforms on a soft grid, skip ~55% of cells for breathing room.
+    const cellW = 220;
+    const cellH = 240;
+    const cols = Math.max(2, Math.round(width / cellW));
+    const rows = Math.max(3, Math.round(height / cellH));
+    const bases = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (rng() < 0.55) continue;
+        const cx = (c + 0.5) * cellW + (rng() - 0.5) * 35;
+        const cy = (r + 0.5) * cellH + (rng() - 0.5) * 35;
+        const sw = 45 + rng() * 50;
+        const sh = sw / 2;
+        const levelH = 18 + Math.floor(rng() * 10);
+        const levels = 2 + Math.floor(rng() * 3);
+        let csw = sw, csh = sh, cyOff = cy;
+        let topSw = csw, topSh = csh, topCy = cyOff;
+        for (let lv = 0; lv < levels; lv++) {
+          pushCube(cx, cyOff, csw, csh, levelH);
+          topSw = csw * 0.82;
+          topSh = csh * 0.82;
+          topCy = cyOff - levelH;
+          cyOff = topCy; csw = topSw; csh = topSh;
+        }
+        // Detail cubes on top face
+        const details = 1 + Math.floor(rng() * 3);
+        for (let d = 0; d < details; d++) {
+          const dxR = (rng() - 0.5) * topSw * 0.55;
+          const dyR = (rng() - 0.5) * topSh * 0.55;
+          const ds = 5 + rng() * 6;
+          pushCube(cx + dxR, topCy + dyR, ds, ds / 2, ds * 0.7);
+        }
+        bases.push({ cx, cy: cy + 4 });
+      }
+    }
+
+    // Circuit wires — L-shaped right-angle paths between random platform bases.
+    const wireCount = Math.floor(bases.length * 0.55);
+    for (let i = 0; i < wireCount; i++) {
+      const a = bases[Math.floor(rng() * bases.length)];
+      const b = bases[Math.floor(rng() * bases.length)];
+      if (a === b) continue;
+      const d = `M ${a.cx.toFixed(1)} ${a.cy.toFixed(1)} L ${b.cx.toFixed(1)} ${a.cy.toFixed(1)} L ${b.cx.toFixed(1)} ${b.cy.toFixed(1)}`;
+      wires.push(`<path d="${d}" stroke="${TERRAIN_PALETTE.wire}" stroke-width="2" fill="none" stroke-linecap="round" filter="url(#vt-glow)"/>`);
+      // 30% chance of a vertical Y-branch stub terminating in a dot.
+      if (rng() < 0.30) {
+        const mx = (a.cx + b.cx) / 2;
+        const my = a.cy - 25 - rng() * 50;
+        wires.push(`<path d="M ${mx.toFixed(1)} ${a.cy.toFixed(1)} L ${mx.toFixed(1)} ${my.toFixed(1)}" stroke="${TERRAIN_PALETTE.wire}" stroke-width="2" fill="none" stroke-linecap="round" filter="url(#vt-glow)"/>`);
+        wires.push(`<circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="2.4" fill="${TERRAIN_PALETTE.wire}" filter="url(#vt-glow)"/>`);
+      }
+    }
+
+    return (
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid slice">` +
+      `<defs>` +
+        `<filter id="vt-glow" x="-50%" y="-50%" width="200%" height="200%">` +
+          `<feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="b"/>` +
+          `<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>` +
+        `</filter>` +
+      `</defs>` +
+      `<rect width="${width}" height="${height}" fill="${TERRAIN_PALETTE.bg}"/>` +
+      cubes.join('') +
+      wires.join('') +
+      `</svg>`
+    );
+  }
+
+  function injectTerrain() {
+    const host = document.getElementById('terrainLayer');
+    if (!host) return;
+    const parallax = document.querySelector('.parallax');
+    const w = (parallax && parallax.offsetWidth) || window.innerWidth || 430;
+    const h = (mapEl && mapEl.offsetHeight) || 2000;
+    host.innerHTML = buildVoxelTerrain(w, h, 12345);
+  }
+  // Inject after the map first renders. Two rAFs gives layout a chance
+  // to settle before we read offsetHeight.
+  requestAnimationFrame(() => requestAnimationFrame(injectTerrain));
+
   /* ---------- Bootstrap ---------- */
   renderHeader();
   renderEditor();
