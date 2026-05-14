@@ -958,6 +958,12 @@
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const MOTION_BLUR_GAIN = 0.10;   // px of blur per px of effective frame velocity
   const MOTION_BLUR_MAX  = 6;      // hard cap to avoid mush at fast flings
+  // Terrain parallax: lag factor relative to page scroll.
+  //   0    = terrain scrolls 1:1 with page (no parallax)
+  //   0.3  = terrain lags 30% behind → moves 70% as fast as page (subtle depth)
+  //   0.5  = terrain lags 50% → moves 50% as fast (strong depth)
+  const TERRAIN_LAG = 0.30;
+  const terrainLayer = document.getElementById('terrainLayer');
 
   function tickParallax() {
     parallaxFrame = null;
@@ -971,9 +977,6 @@
       if (!el) continue;
       const speed = speeds[key];
       el.style.transform = `translate3d(0, ${(-y * speed).toFixed(2)}px, 0)`;
-      // Effective frame-to-frame motion of clouds in this layer:
-      // page scrolls by `delta`, layer translates by `delta * speed`,
-      // so cloud's screen velocity ≈ |delta| × (1 + speed).
       const blur = Math.min(MOTION_BLUR_MAX, Math.abs(delta) * (1 + speed) * MOTION_BLUR_GAIN);
       if (blur > 0.15) {
         el.style.filter = `blur(${blur.toFixed(2)}px)`;
@@ -982,8 +985,11 @@
         el.style.filter = '';
       }
     }
-    // If blur was applied, schedule another frame so it can decay to 0
-    // once scrolling stops (next tick will see delta≈0 and clear filter).
+    // Terrain background — positive translate = layer lags down behind the
+    // page scroll, so it appears to move slower than the islands above.
+    if (terrainLayer) {
+      terrainLayer.style.transform = `translate3d(0, ${(y * TERRAIN_LAG).toFixed(2)}px, 0)`;
+    }
     if (appliedBlur) {
       parallaxFrame = requestAnimationFrame(tickParallax);
     }
