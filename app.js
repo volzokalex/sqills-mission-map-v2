@@ -1119,31 +1119,37 @@
     }
     host.innerHTML = html;
   }
-  // Full iso-tile background is off; we only place a single "pedestal"
-  // under mission #1 (index 0) using the blackland asset.
-  function placePedestalMission0() {
+  // Pedestal tile under specific missions. Edit PEDESTAL_MISSION_IDS to
+  // change which missions get the platform.
+  const PEDESTAL_MISSION_IDS = [0, 1, 2, 3];  // missions #1..#4
+  function placePedestals() {
     const host = document.getElementById('terrainLayer');
     if (!host || missions.length === 0) return;
     const parallax = document.querySelector('.parallax');
     const appW   = (parallax && parallax.offsetWidth) || 430;
-    const tileW  = appW * 0.62;                // shrunk a further 20%
-    const diamondCenterInImg = tileW * 0.25;    // 2:1 iso → diamond half-height
-    const missionCenterY = ISLAND_TOP_OFFSET + 0 * ISLAND_PITCH + ISLAND_SIZE / 2;
-    const TILE_Y_OFFSET = 40;                   // shift pedestal down by Npx
+    const tileW  = appW * 0.62;
+    const diamondCenterInImg = tileW * 0.25;
+    const TILE_Y_OFFSET = 40;
     const left = (appW / 2) - (tileW / 2);
-    const top  = missionCenterY - diamondCenterInImg + TILE_Y_OFFSET;
-    host.innerHTML =
-      `<img class="terrain-tile" src="assets/terrain/blackland.png?v=1" ` +
-      `alt="" draggable="false" ` +
-      `style="--tw:${tileW.toFixed(1)}px;left:${left.toFixed(1)}px;top:${top.toFixed(1)}px">`;
+    let html = '';
+    for (const idx of PEDESTAL_MISSION_IDS) {
+      if (idx >= missions.length) continue;
+      const missionCenterY = ISLAND_TOP_OFFSET + idx * ISLAND_PITCH + ISLAND_SIZE / 2;
+      const top = missionCenterY - diamondCenterInImg + TILE_Y_OFFSET;
+      html +=
+        `<img class="terrain-tile" src="assets/terrain/blackland.png?v=1" ` +
+        `alt="" draggable="false" ` +
+        `style="--tw:${tileW.toFixed(1)}px;left:${left.toFixed(1)}px;top:${top.toFixed(1)}px">`;
+    }
+    host.innerHTML = html;
   }
-  requestAnimationFrame(() => requestAnimationFrame(placePedestalMission0));
+  requestAnimationFrame(() => requestAnimationFrame(placePedestals));
   let pedestalResizeFrame = null;
   window.addEventListener('resize', () => {
     if (pedestalResizeFrame) return;
     pedestalResizeFrame = requestAnimationFrame(() => {
       pedestalResizeFrame = null;
-      placePedestalMission0();
+      placePedestals();
     });
   }, { passive: true });
 
