@@ -994,18 +994,25 @@
   window.addEventListener('scroll', onScroll, { passive: true });
 
   /* ---------- Iso voxel-terrain tiling ----------
-     Iso-brick pattern: tiles are small squares, every other row is offset
-     horizontally by half a tile, vertical step is less than tile height
-     so cliff faces tuck behind the next row's back-point — a continuous
-     iso "floor" made of repeating biome plates.
+     True isometric grid: tiles share diamond vertices, painter's-ordered
+     by depth (i+j ascending). Front tiles cover back tiles' cliff faces,
+     giving a continuous iso floor.
 
-     Painter's order is by row (top row first in DOM → bottom row last),
-     so front-rows correctly paint over back-rows for iso depth. */
-  const TERRAIN_TILE_SRC = 'assets/terrain/tile.png?v=1';
-  const TERRAIN_TILE_PCT = 0.50;   // tile width = 50% of app width
-  const TERRAIN_ASPECT   = 1.0;    // square asset
-  const TERRAIN_Y_STEP   = 0.62;   // vertical row step as fraction of tile height
-  const TERRAIN_OVERSHOOT = 1;     // extra tiles beyond viewport edges per row
+     Diamond geometry inside the source PNG (768×621):
+       - Top face: 2:1 ratio (halfW = tileW/2, halfH = tileW/4)
+       - Diamond top vertex sits at the PNG top edge
+       - Cliff face extends below the diamond, filling lower part of PNG
+     PNG image-aspect (h/w) = 621/768 ≈ 0.808.
+
+     Iso step:
+       moving i+1 → screen shifts (+halfW, +halfH)
+       moving j+1 → screen shifts (-halfW, +halfH)
+     Render order: by depth (i+j) ascending, so the closest tiles paint last. */
+  const TERRAIN_TILE_SRC      = 'assets/terrain/tile.png?v=1';
+  const TERRAIN_TILE_PCT      = 0.40;    // tile width = 40% of app width
+  const TERRAIN_IMG_ASPECT    = 621 / 768; // PNG height / width
+  const TERRAIN_DIAMOND_RATIO = 0.50;    // diamond height / diamond width (2:1 iso)
+  const TERRAIN_MARGIN_TILES  = 1;       // extra rings of tiles outside viewport
 
   function injectTerrain() {
     const host = document.getElementById('terrainLayer');
@@ -1013,25 +1020,46 @@
     const parallax = document.querySelector('.parallax');
     const appW   = (parallax && parallax.offsetWidth) || 430;
     const tileW  = appW * TERRAIN_TILE_PCT;
-    const tileH  = tileW * TERRAIN_ASPECT;
-    const xStep  = tileW;
-    const yStep  = tileH * TERRAIN_Y_STEP;
+    const tileH  = tileW * TERRAIN_IMG_ASPECT;
+    const halfW  = tileW / 2;
+    const halfH  = tileW * TERRAIN_DIAMOND_RATIO / 2;
+    // Diamond top vertex sits at IMG top edge, so its centre is halfH below.
+    const diamondCenterInImg = halfH;
     const mapH   = (mapEl && mapEl.offsetHeight) || 2000;
-    const rows   = Math.max(1, Math.ceil(mapH / yStep) + 1);
-    // Fit at least 2 tiles across + overshoot on both sides for offset rows.
-    const colsBase = Math.ceil(appW / xStep) + TERRAIN_OVERSHOOT * 2;
-    let html = '';
-    for (let j = 0; j < rows; j++) {
-      const top = j * yStep;
-      const offsetX = (j % 2) * (xStep / 2);
-      // Start one tile left of viewport so offset rows still cover the edge.
-      const startX = -xStep + offsetX;
-      for (let i = 0; i < colsBase; i++) {
-        const left = startX + i * xStep;
-        html +=
-          `<img class="terrain-tile" src="${TERRAIN_TILE_SRC}" alt="" draggable="false" ` +
-          `style="--tw:${tileW.toFixed(1)}px;left:${left.toFixed(1)}px;top:${top.toFixed(1)}px">`;
+    const centerX = appW / 2;
+
+    // Iso (i, j) → screen (cx, cy).
+    //   cx = (i - j) * halfW + centerX
+    //   cy = (i + j) * halfH
+    // We iterate by sum = i+j and diff = i-j; sum + diff must be even.
+    const sumMax   = Math.ceil((mapH + tileH) / halfH) + TERRAIN_MARGIN_TILES * 2;
+    const diffSpan = Math.ceil((appW / halfW) / 2) + TERRAIN_MARGIN_TILES + 1;
+
+    const tiles = [];
+    for (let sum = 0; sum <= sumMax; sum++) {
+      for (let diff = -diffSpan; diff <= diffSpan; diff++) {
+        if (((sum + diff) & 1) !== 0) continue; // need same parity
+        const cx = diff * halfW + centerX;
+        const cy = sum * halfH;
+        // IMG top-left = (cx - halfW, cy - diamondCenterInImg)
+        const left = cx - halfW;
+        const top  = cy - diamondCenterInImg;
+        // Quick visibility cull
+        if (left + tileW < -halfW) continue;
+        if (left > appW + halfW) continue;
+        if (top + tileH < 0) continue;
+        if (top > mapH + tileH) continue;
+        tiles.push({ sum, left, top });
       }
+    }
+    // Painter's order: shallower depth first (back), deepest last (front).
+    tiles.sort((a, b) => a.sum - b.sum);
+
+    let html = '';
+    for (const t of tiles) {
+      html +=
+        `<img class="terrain-tile" src="${TERRAIN_TILE_SRC}" alt="" draggable="false" ` +
+        `style="--tw:${tileW.toFixed(1)}px;left:${t.left.toFixed(1)}px;top:${t.top.toFixed(1)}px">`;
     }
     host.innerHTML = html;
   }
