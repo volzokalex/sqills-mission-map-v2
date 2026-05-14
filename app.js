@@ -288,17 +288,34 @@
         if (dy > maxDySum) maxDySum = dy;
       }
       const centerDx = (minDx + maxDx) / 2;
+      // 3-cluster Y stretch: middle stays anchored, top moves up, bottom moves
+      // down, each by 20% of halfH relative to middle. Effective dy values:
+      //   top    0   → -0.2
+      //   middle 1   →  1   (unchanged)
+      //   bottom 2   →  2.2
+      const stretchY3 = (size === 3);
+      const topDyOffset    = stretchY3 ? -0.2 : 0;
+      const bottomDyOffset = stretchY3 ?  2.2 : maxDySum;
       for (let n = 0; n < size; n++) {
         const missionIdx = group.missionIds[n];
         const p          = pattern[n];
         const dxUnits    = (p.i - p.j) - centerDx;
-        const dySum      = p.i + p.j;
+        const dySumRaw   = p.i + p.j;
+        let effectiveDy;
+        if (stretchY3) {
+          if (dySumRaw === 0)      effectiveDy = -0.2;
+          else if (dySumRaw === 2) effectiveDy =  2.2;
+          else                     effectiveDy =  1.0;
+        } else {
+          effectiveDy = dySumRaw;
+        }
         const xPct = 50 + dxUnits * halfW_pct;
-        const y    = groupTopY + dySum * halfH;
+        const y    = groupTopY + effectiveDy * halfH;
         positions[missionIdx] = { xPct, y, isFinal: group.isFinal };
       }
       const finalIslandH = group.isFinal ? ISLAND_SIZE * LAST_SCALE : ISLAND_SIZE;
-      groupTopY += maxDySum * halfH + finalIslandH + GROUP_GAP;
+      // Advance by full cluster vertical span (incl. stretch top offset) + station + gap.
+      groupTopY += (bottomDyOffset - topDyOffset) * halfH + finalIslandH + GROUP_GAP;
     }
     const totalHeight = groupTopY - GROUP_GAP;
     return { positions, totalHeight };
