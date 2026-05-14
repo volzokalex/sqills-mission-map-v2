@@ -429,20 +429,20 @@ input { font: inherit; color: inherit; }
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
-/* Warm amber square glow under every station — soft halo radiates out. */
+/* Warm amber glow under every station — spills onto the pedestal below. */
 .island::before {
   content: '';
   position: absolute;
   left: 50%;
-  bottom: 10%;
-  width: 50%;
-  height: 50%;
+  bottom: -22%;
+  width: 78%;
+  height: 32%;
   transform: translateX(-50%);
-  background: rgba(255, 138, 50, 0.32);
-  border-radius: 4px;
-  box-shadow:
-    0 0 12px 4px rgba(255, 138, 50, 0.55),
-    0 0 28px 10px rgba(255, 138, 50, 0.30);
+  background: radial-gradient(ellipse closest-side,
+    rgba(255, 138, 50, 0.55) 0%,
+    rgba(255, 138, 50, 0.20) 45%,
+    rgba(255, 138, 50, 0)    72%);
+  filter: blur(6px);
   pointer-events: none;
 }
 .island img,
