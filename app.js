@@ -1291,8 +1291,13 @@
       const missionCenterY = pos.y + islandSize / 2;
       const left = missionCenterX - tileW / 2;
       const top  = missionCenterY - diamondHalf + TILE_Y_OFFSET;
+      // First and final missions get the edge variant; all others use mid.
+      const isFirst = idx === 0;
+      const tileSrc = (isFirst || isFinal)
+        ? 'assets/terrain/blackland-edge.png?v=1'
+        : 'assets/terrain/blackland-mid.png?v=1';
       html +=
-        `<img class="terrain-tile" src="assets/terrain/blackland.png?v=1" ` +
+        `<img class="terrain-tile" src="${tileSrc}" ` +
         `alt="" draggable="false" ` +
         `style="--tw:${tileW.toFixed(1)}px;left:${left.toFixed(1)}px;top:${top.toFixed(1)}px">`;
     }
