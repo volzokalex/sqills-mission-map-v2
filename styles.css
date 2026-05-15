@@ -562,11 +562,13 @@ input { font: inherit; color: inherit; }
   padding: 0;
   border: 0;
   box-shadow: none;
-  /* Stronger drop + halo for legibility on any background. */
+  /* Heavy outline + halo so the label punches through any background. */
   text-shadow:
-    0 0   2px rgba(0, 0, 0, 1.0),
-    0 2px 4px rgba(0, 0, 0, 0.95),
-    0 4px 12px rgba(0, 0, 0, 0.75);
+    0 0  3px  rgba(0, 0, 0, 1.0),
+    0 0  6px  rgba(0, 0, 0, 1.0),
+    0 2px 4px rgba(0, 0, 0, 1.0),
+    0 4px 16px rgba(0, 0, 0, 0.9),
+    0 8px 28px rgba(0, 0, 0, 0.7);
   width: max-content;
   max-width: 90%;
   text-align: center;
