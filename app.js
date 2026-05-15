@@ -1078,12 +1078,12 @@
     mid:   document.querySelector('.cloud-layer--mid'),
     near:  document.querySelector('.cloud-layer--near')
   };
-  const speeds = { decor: 0.005, far: 0.0125, mid: 0.075, near: 0.14 };
+  const speeds = { decor: 0.025, far: 0.0125, mid: 0.075, near: 0.14 };
   // Width ranges scaled for tall steam wisps (≈1:2.2 aspect).
   const cloudLayerConfig = {
-    far:  { count: 100, wMin: 4,  wMax: 8,  oMin: 0.35, oMax: 0.55 },
-    mid:  { count: 100, wMin: 6,  wMax: 12, oMin: 0.50, oMax: 0.75 },
-    near: { count: 100, wMin: 10, wMax: 20, oMin: 0.65, oMax: 0.90 }
+    far:  { count: 100, wMin: 4,  wMax: 8,  oMin: 0.15, oMax: 0.30 },
+    mid:  { count: 100, wMin: 6,  wMax: 12, oMin: 0.22, oMax: 0.40 },
+    near: { count: 100, wMin: 10, wMax: 20, oMin: 0.30, oMax: 0.50 }
   };
   const CLOUD_SRCS = [
     'assets/terrain/decor-1.png?v=1',
