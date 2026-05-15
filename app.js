@@ -1300,14 +1300,17 @@
         `<img class="terrain-tile" src="assets/terrain/blackland.png?v=1" ` +
         `alt="" draggable="false" ` +
         `style="--tw:${tileW.toFixed(1)}px;left:${left.toFixed(1)}px;top:${top.toFixed(1)}px">`;
-      // Decor cubes — 2..4 per pedestal, scattered on the top face area.
-      // Seeded by idx so positions are stable across renders.
+      // Decor cubes — scattered on the top face area, stable per-mission seed.
+      // First (idx 0) and final pedestals get extra density (4..7), others 2..4.
       const decorRng  = makeRng(idx * 1009 + 47);
-      const decorN    = 2 + Math.floor(decorRng() * 3);   // 2, 3 or 4
+      const isSolo    = (idx === 0) || isFinal;
+      const decorN    = isSolo
+        ? 4 + Math.floor(decorRng() * 4)   // 4..7 for first + last
+        : 2 + Math.floor(decorRng() * 3);  // 2..4 for the rest
       const pedestalCenterY = missionCenterY + TILE_Y_OFFSET;
       for (let d = 0; d < decorN; d++) {
         const src = DECOR_SRCS[Math.floor(decorRng() * DECOR_SRCS.length)];
-        const dW  = tileW * (0.04 + decorRng() * 0.05);   // 4..9% of tileW
+        const dW  = tileW * (0.20 + decorRng() * 0.25);   // 20..45% of tileW (5× of 4..9)
         const dx  = (decorRng() - 0.5) * tileW * 0.70;
         const dy  = (decorRng() - 0.5) * tileW * 0.22;
         const dl  = missionCenterX + dx - dW / 2;
