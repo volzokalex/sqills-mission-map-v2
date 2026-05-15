@@ -1276,7 +1276,7 @@
     const parallax = document.querySelector('.parallax');
     const appW   = (parallax && parallax.offsetWidth) || 430;
     const baseTileW   = appW * TERRAIN_TILE_PCT;
-    const TILE_Y_OFFSET = 34;                   // tile sits VISUALLY beneath station (proportional)
+    const TILE_Y_OFFSET = 82;                   // tile sits VISUALLY beneath station (lowered ~30% of station size)
     const count = missions.length;
     const layout = ensureLayout(count);
     let html = '';
