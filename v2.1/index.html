@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0F0E0C">
+  <title>Mission Map — Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260515ax">
+</head>
+<body>
+  <div class="identity-band" aria-hidden="true"></div>
+
+  <header class="app-header">
+    <div class="header-row">
+      <button class="plan-pill" type="button" aria-label="Plan switcher">
+        <span class="plan-pill__title" id="planTitle">AI Income Challenge</span>
+        <svg class="plan-pill__chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="avatar" type="button" aria-label="Profile">R</button>
+    </div>
+    <div class="progress">
+      <div class="progress__track">
+        <div class="progress__fill" id="progressFill"></div>
+      </div>
+      <span class="progress__counter" id="progressCounter">0/0</span>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="map" aria-selected="true">Map</button>
+      <button class="tab" role="tab" data-tab="editor" aria-selected="false">Editor</button>
+    </nav>
+  </header>
+
+  <!-- ============== MAP TAB ============== -->
+  <section class="tab-panel tab-panel--map" data-panel="map" aria-label="Mission map">
+    <div class="parallax" aria-hidden="true">
+      <div class="sky"></div>
+      <!-- Iso voxel-terrain backdrop — vertical tile column, populated by JS. -->
+      <div class="terrain-layer" id="terrainLayer"></div>
+      <!-- Static-ish decor cubes (slowest parallax). -->
+      <div class="decor-layer" id="decorLayer"></div>
+      <div class="cloud-layer cloud-layer--far"></div>
+      <div class="cloud-layer cloud-layer--mid"></div>
+      <div class="cloud-layer cloud-layer--near"></div>
+    </div>
+
+    <div class="map" id="map">
+      <div class="trail" id="trail" aria-hidden="true"></div>
+      <ol class="islands" id="islands"></ol>
+      <!-- Labels + progress bars live above every island so cluster
+           overlap never hides them. -->
+      <ol class="island-labels" id="islandLabels" aria-hidden="true"></ol>
+    </div>
+
+    <div class="empty-state" id="emptyState" hidden>
+      <h2>No islands yet</h2>
+      <p>Open the <button type="button" class="link-to-editor" data-go="editor">Editor</button> tab and upload your first island PNG.</p>
+    </div>
+  </section>
+
+  <!-- ============== EDITOR TAB ============== -->
+  <section class="tab-panel tab-panel--editor" data-panel="editor" hidden aria-label="Mission editor">
+    <div class="editor">
+      <label class="dropzone" id="dropzone">
+        <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" multiple hidden>
+        <div class="dropzone__inner">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 4v12m0 0l-5-5m5 5l5-5M5 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <strong>Drop island PNGs here</strong>
+          <span>or click to choose files</span>
+        </div>
+      </label>
+
+      <div class="editor-toggles">
+        <label class="toggle">
+          <input type="checkbox" id="toggleHideTitles">
+          <span>Hide Titles</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="toggleHideConnections">
+          <span>Hide Connections</span>
+        </label>
+      </div>
+
+      <ol class="mission-list" id="missionList"></ol>
+
+      <div class="editor-actions">
+        <button class="btn-ghost" id="exportJson" type="button">Export JSON</button>
+        <button class="btn-ghost" id="resetAll" type="button">Reset all islands</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="sample-data.js?v=20260515ax"></script>
+  <script src="app.js?v=20260515ax"></script>
+</body>
+</html>
