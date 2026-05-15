@@ -19,7 +19,7 @@
   // Iso step is keyed to the PEDESTAL width (not station). Multipliers
   // tuned so pedestals share their diamond corners (tight iso) but the
   // stations on top have visible breathing room between them.
-  const TERRAIN_TILE_PCT = 0.568;    // pedestal width as fraction of viewport (+10%)
+  const TERRAIN_TILE_PCT = 0.738;    // pedestal width as fraction of viewport (+30%)
   const ISO_STEP_X_RATIO = 0.65;     // halfW = pedestalW × 0.65  (visible gap between pedestals)
   const ISO_STEP_Y_RATIO = 0.40;     // halfH = pedestalW × 0.40  (extra vertical room)
   const ALPHA_CROP_THRESHOLD = 8;    // alpha below this counts as transparent for auto-crop
