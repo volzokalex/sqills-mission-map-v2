@@ -478,9 +478,23 @@
 
       const slotCls = isLast ? 'island-slot island-slot--last' : 'island-slot';
       const progressPct = Math.max(0, Math.min(100, Number(m.progress) || 0));
-      const progressHtml = m.progressEnabled
-        ? `<div class="island-progress" aria-hidden="true"><div class="island-progress__fill" style="--p:${progressPct}%"></div></div>`
-        : '';
+      let progressHtml = '';
+      if (m.progressEnabled) {
+        if (progressPct >= 100) {
+          progressHtml =
+            `<div class="island-progress island-progress--done" aria-hidden="true">` +
+              `<svg class="island-check" viewBox="0 0 16 16">` +
+                `<path d="M3 8 L7 12 L13 4" fill="none" stroke="currentColor" ` +
+                `stroke-width="3" stroke-linecap="square" stroke-linejoin="miter"/>` +
+              `</svg>` +
+            `</div>`;
+        } else {
+          progressHtml =
+            `<div class="island-progress" aria-hidden="true">` +
+              `<div class="island-progress__fill" style="--p:${progressPct}%"></div>` +
+            `</div>`;
+        }
+      }
       html += `
         <li class="${slotCls}" style="left:${x}%; top:${y}px;">
           <button class="island state-${m.state}" type="button"
@@ -810,16 +824,23 @@
         if (!Number.isFinite(v)) v = 0;
         v = Math.max(0, Math.min(100, Math.round(v)));
         m.progress = v;
-        // 100% → flip the mission state to done (demoting current if needed).
-        if (v === 100 && m.state !== 'done') {
-          m.state = 'done';
-          persist();
-          renderEditor();
-          renderMap();
-          renderHeader();
-          return;
+        // Progress drives state:
+        //   100  → done
+        //   <100 → current (active); demote any other current first
+        let stateChanged = false;
+        if (v >= 100) {
+          if (m.state !== 'done') { m.state = 'done'; stateChanged = true; }
+        } else {
+          if (m.state !== 'current') {
+            missions.forEach(x => {
+              if (x.id !== id && x.state === 'current') x.state = 'available';
+            });
+            m.state = 'current';
+            stateChanged = true;
+          }
         }
         persist();
+        if (stateChanged) renderEditor();
         renderMap();
         renderHeader();
       });
