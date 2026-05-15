@@ -548,30 +548,27 @@ input { font: inherit; color: inherit; }
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
 }
 
-/* Island label — anchored to the pedestal's front (bottom) corner. */
+/* Island label — plain cream text below the pedestal, no bubble. */
 .island-label {
   position: absolute;
   left: 50%;
-  top: calc(100% + 15px);                /* center 15px below island bottom (≈ front vertex of pedestal) */
+  top: calc(100% + 40px);
   transform: translate(-50%, -50%);
   font-size: 13px;
   font-weight: 600;
   line-height: 1.2;
-  color: var(--text-primary);
-  background: rgba(255, 247, 230, 0.92);
-  padding: 4px 12px;
-  border-radius: 12px;
-  border: 1px solid var(--border-subtle);
-  box-shadow: 0 2px 6px rgba(24, 19, 12, 0.08);
+  color: rgba(255, 247, 230, 0.95);
+  background: none;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
   width: max-content;
   max-width: 90%;
   text-align: center;
   white-space: normal;
 }
-/* Last mission has a larger pedestal — its front vertex is closer to
-   the island bottom, so the label needs less downward shift. */
 .island-slot--last .island-label {
-  top: calc(100% + 3px);
+  top: calc(100% + 25px);
 }
 
 /* Empty state */
