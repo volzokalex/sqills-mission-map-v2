@@ -238,6 +238,16 @@ input { font: inherit; color: inherit; }
   will-change: transform;
   z-index: 0;
 }
+/* Slowest parallax layer — hosts the formerly-static decor cubes. */
+.decor-layer {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 200%;
+  pointer-events: none;
+  overflow: hidden;
+  will-change: transform;
+  z-index: 0;
+}
 .terrain-tile {
   position: absolute;
   width: var(--tw, 50%);

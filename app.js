@@ -1073,11 +1073,12 @@
      Three depth layers populated with voxel-cloud PNG: far layer is small
      + slow, near layer is large + fast. ~100 clouds total. */
   const layers = {
-    far:  document.querySelector('.cloud-layer--far'),
-    mid:  document.querySelector('.cloud-layer--mid'),
-    near: document.querySelector('.cloud-layer--near')
+    decor: document.getElementById('decorLayer'),
+    far:   document.querySelector('.cloud-layer--far'),
+    mid:   document.querySelector('.cloud-layer--mid'),
+    near:  document.querySelector('.cloud-layer--near')
   };
-  const speeds = { far: 0.025, mid: 0.15, near: 0.28 };
+  const speeds = { decor: 0.005, far: 0.025, mid: 0.15, near: 0.28 };
   // Width ranges scaled for tall steam wisps (≈1:2.2 aspect).
   const cloudLayerConfig = {
     far:  { count: 100, wMin: 4,  wMax: 8,  oMin: 0.35, oMax: 0.55 },
@@ -1274,6 +1275,7 @@
   ];
   function placePedestals() {
     const host = document.getElementById('terrainLayer');
+    const decorHost = document.getElementById('decorLayer');
     if (!host || missions.length === 0) return;
     const parallax = document.querySelector('.parallax');
     const appW   = (parallax && parallax.offsetWidth) || 430;
@@ -1282,6 +1284,7 @@
     const count = missions.length;
     const layout = ensureLayout(count);
     let html = '';
+    let decorHtml = '';
     for (let idx = 0; idx < count; idx++) {
       const pos = layout.positions[idx];
       if (!pos) continue;
@@ -1312,13 +1315,14 @@
         const dy  = (decorRng() - 0.5) * tileW * 0.45;  // taller spread
         const dl  = missionCenterX + dx - dW / 2;
         const dt  = pedestalCenterY + dy - dW / 2;
-        html +=
+        decorHtml +=
           `<img class="terrain-decor" src="${src}" ` +
           `alt="" draggable="false" ` +
           `style="--dw:${dW.toFixed(1)}px;left:${dl.toFixed(1)}px;top:${dt.toFixed(1)}px">`;
       }
     }
     host.innerHTML = html;
+    if (decorHost) decorHost.innerHTML = decorHtml;
   }
   requestAnimationFrame(() => requestAnimationFrame(placePedestals));
   let pedestalResizeFrame = null;
