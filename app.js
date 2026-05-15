@@ -1270,6 +1270,11 @@
   }
   // Pedestal tile under EVERY mission, using the placement that already
   // looks right for mission #1. Same tileW + TILE_Y_OFFSET for all.
+  const DECOR_SRCS = [
+    'assets/terrain/decor-1.png?v=1',
+    'assets/terrain/decor-2.png?v=1',
+    'assets/terrain/decor-3.png?v=1'
+  ];
   function placePedestals() {
     const host = document.getElementById('terrainLayer');
     if (!host || missions.length === 0) return;
@@ -1295,6 +1300,23 @@
         `<img class="terrain-tile" src="assets/terrain/blackland.png?v=1" ` +
         `alt="" draggable="false" ` +
         `style="--tw:${tileW.toFixed(1)}px;left:${left.toFixed(1)}px;top:${top.toFixed(1)}px">`;
+      // Decor cubes — 2..4 per pedestal, scattered on the top face area.
+      // Seeded by idx so positions are stable across renders.
+      const decorRng  = makeRng(idx * 1009 + 47);
+      const decorN    = 2 + Math.floor(decorRng() * 3);   // 2, 3 or 4
+      const pedestalCenterY = missionCenterY + TILE_Y_OFFSET;
+      for (let d = 0; d < decorN; d++) {
+        const src = DECOR_SRCS[Math.floor(decorRng() * DECOR_SRCS.length)];
+        const dW  = tileW * (0.04 + decorRng() * 0.05);   // 4..9% of tileW
+        const dx  = (decorRng() - 0.5) * tileW * 0.70;
+        const dy  = (decorRng() - 0.5) * tileW * 0.22;
+        const dl  = missionCenterX + dx - dW / 2;
+        const dt  = pedestalCenterY + dy - dW / 2;
+        html +=
+          `<img class="terrain-decor" src="${src}" ` +
+          `alt="" draggable="false" ` +
+          `style="--dw:${dW.toFixed(1)}px;left:${dl.toFixed(1)}px;top:${dt.toFixed(1)}px">`;
+      }
     }
     host.innerHTML = html;
   }

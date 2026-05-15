@@ -247,6 +247,15 @@ input { font: inherit; color: inherit; }
   image-rendering: -webkit-optimize-contrast;
   filter: drop-shadow(0 14px 6px rgba(24, 19, 12, 0.55));
 }
+.terrain-decor {
+  position: absolute;
+  width: var(--dw, 14px);
+  height: auto;
+  display: block;
+  pointer-events: none;
+  image-rendering: pixelated;
+  image-rendering: -webkit-optimize-contrast;
+}
 .cloud-layer {
   position: absolute;
   top: 0; left: 0; right: 0;
