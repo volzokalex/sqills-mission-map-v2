@@ -1085,9 +1085,9 @@
     near: { count: 100, wMin: 43, wMax: 80, oMin: 0.65, oMax: 0.90 }
   };
   const CLOUD_SRCS = [
-    'assets/clouds/steam-1.png?v=2',
-    'assets/clouds/steam-2.png?v=2',
-    'assets/clouds/steam-3.png?v=2'
+    'assets/terrain/decor-1.png?v=1',
+    'assets/terrain/decor-2.png?v=1',
+    'assets/terrain/decor-3.png?v=1'
   ];
 
   // Seeded RNG so cloud scatter is stable across reloads.
@@ -1113,10 +1113,8 @@
       const o = oMin + rng() * (oMax - oMin);
       const flip = rng() < 0.5 ? 'scaleX(-1)' : 'scaleX(1)';
       const src = CLOUD_SRCS[Math.floor(rng() * CLOUD_SRCS.length)];
-      // ~25% of clouds get the warm-amber tint variant.
-      const orangeCls = rng() < 0.25 ? ' cloud--orange' : '';
       html +=
-        `<img class="cloud${orangeCls}" src="${src}" alt="" draggable="false" style="` +
+        `<img class="cloud" src="${src}" alt="" draggable="false" style="` +
         `--x:${x.toFixed(2)}%;` +
         `--y:${y.toFixed(2)}%;` +
         `--w:${w.toFixed(0)}px;` +
@@ -1127,10 +1125,9 @@
     layerEl.innerHTML = html;
   }
 
-  // Cloud parallax disabled — re-enable by uncommenting the three calls.
-  // spawnCloudLayer(layers.far,  cloudLayerConfig.far,  111);
-  // spawnCloudLayer(layers.mid,  cloudLayerConfig.mid,  222);
-  // spawnCloudLayer(layers.near, cloudLayerConfig.near, 333);
+  spawnCloudLayer(layers.far,  cloudLayerConfig.far,  111);
+  spawnCloudLayer(layers.mid,  cloudLayerConfig.mid,  222);
+  spawnCloudLayer(layers.near, cloudLayerConfig.near, 333);
 
   let parallaxFrame = null;
   let lastScrollY = window.scrollY;
