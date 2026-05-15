@@ -1078,7 +1078,7 @@
     mid:   document.querySelector('.cloud-layer--mid'),
     near:  document.querySelector('.cloud-layer--near')
   };
-  const speeds = { decor: 0.005, far: 0.025, mid: 0.15, near: 0.28 };
+  const speeds = { decor: 0.005, far: 0.0125, mid: 0.075, near: 0.14 };
   // Width ranges scaled for tall steam wisps (≈1:2.2 aspect).
   const cloudLayerConfig = {
     far:  { count: 100, wMin: 4,  wMax: 8,  oMin: 0.35, oMax: 0.55 },

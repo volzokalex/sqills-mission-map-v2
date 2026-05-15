@@ -273,7 +273,7 @@ input { font: inherit; color: inherit; }
   /* Extra height so the upward translate doesn't expose a gap at bottom. */
   height: 220%;
   will-change: transform;
-  z-index: 1;
+  z-index: -1;            /* sit BEHIND pedestals, decor and stations */
 }
 
 /* Pixel-confetti parallax dots. Each pixel reads as a small block lifted
