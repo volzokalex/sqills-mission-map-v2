@@ -1305,8 +1305,8 @@
       const decorRng  = makeRng(idx * 1009 + 47);
       const isSolo    = (idx === 0) || isFinal;
       const decorN    = isSolo
-        ? 20 + Math.floor(decorRng() * 16)   // 20..35 (5× of 4..7)
-        : 10 + Math.floor(decorRng() * 11);  // 10..20 (5× of 2..4)
+        ? 10 + Math.floor(decorRng() * 8)    // 10..17 (half)
+        : 5  + Math.floor(decorRng() * 6);   // 5..10  (half)
       const pedestalCenterY = missionCenterY + TILE_Y_OFFSET;
       for (let d = 0; d < decorN; d++) {
         const src = DECOR_SRCS[Math.floor(decorRng() * DECOR_SRCS.length)];
