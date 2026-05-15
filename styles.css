@@ -562,6 +562,10 @@ input { font: inherit; color: inherit; }
   padding: 0;
   border: 0;
   box-shadow: none;
+  /* Sharp drop + soft halo for legibility against the dark canvas. */
+  text-shadow:
+    0 1px 0 rgba(24, 19, 12, 0.85),
+    0 2px 6px rgba(0, 0, 0, 0.65);
   width: max-content;
   max-width: 90%;
   text-align: center;
