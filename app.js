@@ -19,7 +19,7 @@
   // Iso step is keyed to the PEDESTAL width (not station). Multipliers
   // tuned so pedestals share their diamond corners (tight iso) but the
   // stations on top have visible breathing room between them.
-  const TERRAIN_TILE_PCT = 0.738;    // pedestal width as fraction of viewport (+30%)
+  const TERRAIN_TILE_PCT = 0.568;    // pedestal width as fraction of viewport
   const ISO_STEP_X_RATIO = 0.65;     // halfW = pedestalW × 0.65  (visible gap between pedestals)
   const ISO_STEP_Y_RATIO = 0.40;     // halfH = pedestalW × 0.40  (extra vertical room)
   const ALPHA_CROP_THRESHOLD = 8;    // alpha below this counts as transparent for auto-crop
@@ -1276,7 +1276,7 @@
     const parallax = document.querySelector('.parallax');
     const appW   = (parallax && parallax.offsetWidth) || 430;
     const baseTileW   = appW * TERRAIN_TILE_PCT;
-    const TILE_Y_OFFSET = 82;                   // tile sits VISUALLY beneath station (lowered ~30% of station size)
+    const TILE_Y_OFFSET = 34;                   // tile sits VISUALLY beneath station
     const count = missions.length;
     const layout = ensureLayout(count);
     let html = '';
@@ -1291,13 +1291,8 @@
       const missionCenterY = pos.y + islandSize / 2;
       const left = missionCenterX - tileW / 2;
       const top  = missionCenterY - diamondHalf + TILE_Y_OFFSET;
-      // First and final missions get the edge variant; all others use mid.
-      const isFirst = idx === 0;
-      const tileSrc = (isFirst || isFinal)
-        ? 'assets/terrain/blackland-edge.png?v=1'
-        : 'assets/terrain/blackland-mid.png?v=1';
       html +=
-        `<img class="terrain-tile" src="${tileSrc}" ` +
+        `<img class="terrain-tile" src="assets/terrain/blackland.png?v=1" ` +
         `alt="" draggable="false" ` +
         `style="--tw:${tileW.toFixed(1)}px;left:${left.toFixed(1)}px;top:${top.toFixed(1)}px">`;
     }

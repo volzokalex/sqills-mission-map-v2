@@ -245,6 +245,7 @@ input { font: inherit; color: inherit; }
   pointer-events: none;
   image-rendering: pixelated;
   image-rendering: -webkit-optimize-contrast;
+  filter: drop-shadow(0 14px 6px rgba(24, 19, 12, 0.55));
 }
 .cloud-layer {
   position: absolute;
