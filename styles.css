@@ -392,6 +392,14 @@ input { font: inherit; color: inherit; }
   transform: translate(-50%, -50%);
   top: auto;        /* override .island-label's calc(100% + …) */
 }
+/* Long titles wrap to at most 2 lines, with ellipsis past that. */
+.island-labels .island-label {
+  max-width: 180px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .island-slot {
   position: absolute;
   width: var(--island-size);
