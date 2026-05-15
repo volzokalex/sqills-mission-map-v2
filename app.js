@@ -1311,8 +1311,8 @@
       for (let d = 0; d < decorN; d++) {
         const src = DECOR_SRCS[Math.floor(decorRng() * DECOR_SRCS.length)];
         const dW  = tileW * (0.04 + decorRng() * 0.05);   // 4..9% of tileW
-        const dx  = (decorRng() - 0.5) * tileW * 0.70;
-        const dy  = (decorRng() - 0.5) * tileW * 0.22;
+        const dx  = (decorRng() - 0.5) * tileW * 1.05;  // wider spread
+        const dy  = (decorRng() - 0.5) * tileW * 0.45;  // taller spread
         const dl  = missionCenterX + dx - dW / 2;
         const dt  = pedestalCenterY + dy - dW / 2;
         html +=
