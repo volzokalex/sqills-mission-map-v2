@@ -231,8 +231,8 @@ input { font: inherit; color: inherit; }
   height: 100%;
   pointer-events: none;
   overflow: hidden;
-  will-change: transform;
   z-index: 0;
+  contain: paint;
 }
 /* Slowest parallax layer — hosts the formerly-static decor cubes. */
 .decor-layer {
@@ -243,6 +243,7 @@ input { font: inherit; color: inherit; }
   overflow: hidden;
   will-change: transform;
   z-index: 0;
+  contain: paint;
 }
 .terrain-tile {
   position: absolute;
@@ -259,8 +260,6 @@ input { font: inherit; color: inherit; }
   height: auto;
   display: block;
   pointer-events: none;
-  image-rendering: pixelated;
-  image-rendering: -webkit-optimize-contrast;
 }
 .cloud-layer {
   position: absolute;
@@ -269,6 +268,7 @@ input { font: inherit; color: inherit; }
   height: 220%;
   will-change: transform;
   z-index: -1;            /* sit BEHIND pedestals, decor and stations */
+  contain: paint;
 }
 
 .cloud {
@@ -281,8 +281,6 @@ input { font: inherit; color: inherit; }
   /* --tx may include scaleX(-1) flip + slight rotation for chaos. */
   transform: translateX(-50%) var(--tx, scale(1));
   pointer-events: none;
-  image-rendering: pixelated;
-  image-rendering: -webkit-optimize-contrast;
 }
 /* Per-cloud opacity comes from inline `--o`. */
 .cloud {
@@ -538,11 +536,8 @@ input { font: inherit; color: inherit; }
   padding: 0;
   border: 0;
   box-shadow: none;
-  /* Wide, diffused halo — no hard outline. */
-  text-shadow:
-    0 0  16px rgba(0, 0, 0, 0.85),
-    0 0  32px rgba(0, 0, 0, 0.60),
-    0 6px 28px rgba(0, 0, 0, 0.55);
+  /* Single wide halo — cheaper to paint than a stack. */
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.88);
   width: max-content;
   max-width: 90%;
   text-align: center;
