@@ -481,9 +481,9 @@ input { font: inherit; color: inherit; }
 .island.state-current .island-placeholder {
   /* Stronger amber bloom — three stacked drop-shadows for soft glow halo. */
   filter:
-    drop-shadow(0 0 18px rgba(255, 168, 60, 0.60))
-    drop-shadow(0 0 10px rgba(255, 122, 26, 0.40))
-    drop-shadow(0 6px 12px rgba(255, 122, 26, 0.22));
+    drop-shadow(0 0 12px rgba(255, 168, 60, 0.45))
+    drop-shadow(0 0  6px rgba(255, 122, 26, 0.30))
+    drop-shadow(0 4px 8px rgba(255, 122, 26, 0.16));
 }
 .island.state-current { transform: scale(1.07); }
 .island.state-available img,
