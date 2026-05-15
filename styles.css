@@ -562,13 +562,14 @@ input { font: inherit; color: inherit; }
   padding: 0;
   border: 0;
   box-shadow: none;
-  /* Heavy outline + halo so the label punches through any background. */
+  /* Heavy outline + wide halo so the label punches through any background. */
   text-shadow:
-    0 0  3px  rgba(0, 0, 0, 1.0),
-    0 0  6px  rgba(0, 0, 0, 1.0),
-    0 2px 4px rgba(0, 0, 0, 1.0),
-    0 4px 16px rgba(0, 0, 0, 0.9),
-    0 8px 28px rgba(0, 0, 0, 0.7);
+    0 0  4px  rgba(0, 0, 0, 1.0),
+    0 0  12px rgba(0, 0, 0, 1.0),
+    0 0  22px rgba(0, 0, 0, 0.95),
+    0 4px 8px rgba(0, 0, 0, 1.0),
+    0 8px 28px rgba(0, 0, 0, 0.9),
+    0 16px 48px rgba(0, 0, 0, 0.7);
   width: max-content;
   max-width: 90%;
   text-align: center;
