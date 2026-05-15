@@ -1256,99 +1256,10 @@
   }
   window.addEventListener('scroll', onScroll, { passive: true });
 
-  /* ---------- Iso voxel-terrain tiling ----------
-     True isometric grid: tiles share diamond vertices, painter's-ordered
-     by depth (i+j ascending). Front tiles cover back tiles' cliff faces,
-     giving a continuous iso floor.
-
-     Diamond geometry inside the source PNG (768×621):
-       - Top face: 2:1 ratio (halfW = tileW/2, halfH = tileW/4)
-       - Diamond top vertex sits at the PNG top edge
-       - Cliff face extends below the diamond, filling lower part of PNG
-     PNG image-aspect (h/w) = 621/768 ≈ 0.808.
-
-     Iso step:
-       moving i+1 → screen shifts (+halfW, +halfH)
-       moving j+1 → screen shifts (-halfW, +halfH)
-     Render order: by depth (i+j) ascending, so the closest tiles paint last. */
-  // Zones: pick a tile sprite based on the iso row's nearest mission index.
-  // Mission n is centred at screen y ≈ ISLAND_TOP_OFFSET + n × ISLAND_PITCH.
-  const TERRAIN_ZONES = [
-    { from: 0, to: 4,        src: 'assets/terrain/tile-light.png?v=1' },
-    { from: 4, to: 8,        src: 'assets/terrain/tile-dark.png?v=1'  },
-    { from: 8, to: Infinity, src: 'assets/terrain/tile-light.png?v=1' }
-  ];
-  function terrainSpriteForY(cy) {
-    const idx = Math.max(0, Math.round((cy - ISLAND_TOP_OFFSET) / ISLAND_PITCH));
-    for (const z of TERRAIN_ZONES) {
-      if (idx >= z.from && idx < z.to) return z.src;
-    }
-    return TERRAIN_ZONES[TERRAIN_ZONES.length - 1].src;
-  }
-  // (TERRAIN_TILE_PCT lives in the top-level constants block now.)
-  const TERRAIN_IMG_ASPECT    = 621 / 768; // PNG height / width
-  const TERRAIN_DIAMOND_RATIO = 0.50;    // diamond height / diamond width (2:1 iso)
-  // Spacing multipliers: 1.0 = diamond vertices just touch; >1 = visible
-  // cliff face between rows / gap between sides.
-  const TERRAIN_STEP_X_MULT   = 1.0;
-  const TERRAIN_STEP_Y_MULT   = 1.55;
-  const TERRAIN_MARGIN_TILES  = 1;       // extra rings of tiles outside viewport
-
-  function injectTerrain() {
-    const host = document.getElementById('terrainLayer');
-    if (!host) return;
-    const parallax = document.querySelector('.parallax');
-    const appW    = (parallax && parallax.offsetWidth) || 430;
-    const tileW   = appW * TERRAIN_TILE_PCT;
-    const tileH   = tileW * TERRAIN_IMG_ASPECT;
-    const imgHalfW = tileW / 2;
-    // Diamond top vertex sits at the IMG's top edge, so its centre is the
-    // diamond half-height below the IMG top.
-    const diamondHalfH = tileW * TERRAIN_DIAMOND_RATIO / 2;
-    // Iso step between tile centres (independent of IMG size).
-    const stepX = imgHalfW * TERRAIN_STEP_X_MULT;
-    const stepY = diamondHalfH * TERRAIN_STEP_Y_MULT;
-    const mapH    = (mapEl && mapEl.offsetHeight) || 2000;
-    const centerX = appW / 2;
-
-    // Iso (i, j) → screen (cx, cy).
-    //   cx = (i - j) * stepX + centerX
-    //   cy = (i + j) * stepY
-    // We iterate by sum = i+j and diff = i-j; sum + diff must be even.
-    const sumMax   = Math.ceil((mapH + tileH) / stepY) + TERRAIN_MARGIN_TILES * 2;
-    const diffSpan = Math.ceil((appW / stepX) / 2) + TERRAIN_MARGIN_TILES + 1;
-
-    const tiles = [];
-    for (let sum = 0; sum <= sumMax; sum++) {
-      for (let diff = -diffSpan; diff <= diffSpan; diff++) {
-        if (((sum + diff) & 1) !== 0) continue; // need same parity
-        const cx = diff * stepX + centerX;
-        const cy = sum * stepY;
-        // IMG sits centred horizontally on cx; its diamond top vertex
-        // touches the IMG top edge, so we shift up by diamondHalfH.
-        const left = cx - imgHalfW;
-        const top  = cy - diamondHalfH;
-        if (left + tileW < -imgHalfW) continue;
-        if (left > appW + imgHalfW) continue;
-        if (top + tileH < 0) continue;
-        if (top > mapH + tileH) continue;
-        tiles.push({ sum, left, top, cy });
-      }
-    }
-    // Painter's order: shallower depth first (back), deepest last (front).
-    tiles.sort((a, b) => a.sum - b.sum);
-
-    let html = '';
-    for (const t of tiles) {
-      const src = terrainSpriteForY(t.cy);
-      html +=
-        `<img class="terrain-tile" src="${src}" alt="" draggable="false" ` +
-        `style="--tw:${tileW.toFixed(1)}px;left:${t.left.toFixed(1)}px;top:${t.top.toFixed(1)}px">`;
-    }
-    host.innerHTML = html;
-  }
-  // Pedestal tile under EVERY mission, using the placement that already
-  // looks right for mission #1. Same tileW + TILE_Y_OFFSET for all.
+  /* ---------- Pedestals + decor ----------
+     One blackland.png pedestal under every mission, plus 5-17 small
+     voxel-cube decor sprites scattered on each pedestal's top face.
+     Pedestals → #terrainLayer. Decor → #decorLayer (slowest parallax). */
   const DECOR_SRCS = [
     'assets/terrain/decor-1.png?v=1',
     'assets/terrain/decor-2.png?v=1',

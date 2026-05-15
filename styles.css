@@ -224,10 +224,6 @@ input { font: inherit; color: inherit; }
   pointer-events: none;
   overflow: hidden;
 }
-/* .sky is now just background — body already paints --canvas across the frame.
-   Kept as a noop in case other rules reference it. */
-.sky { display: none; }
-.cloud-defs { position: absolute; }
 /* Iso-tile terrain layer — sits under the cloud parallax + islands. */
 .terrain-layer {
   position: absolute;
@@ -275,35 +271,6 @@ input { font: inherit; color: inherit; }
   z-index: -1;            /* sit BEHIND pedestals, decor and stations */
 }
 
-/* Pixel-confetti parallax dots. Each pixel reads as a small block lifted
-   off the canvas — depth tier (d1..d3) drives how heavy the shadow is. */
-.bg-pixel {
-  position: absolute;
-  left: var(--x, 50%);
-  top: var(--y, 50%);
-  width: var(--s, 4px);
-  height: var(--s, 4px);
-  background: var(--c, #18130C);
-  opacity: var(--o, 0.65);
-  border-radius: 1px;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-/* Depth tiers — soft → deep. d1 is flush to surface, d3 reads "tall". */
-.bg-pixel--d1 {
-  box-shadow: 0 1px 1px rgba(24, 19, 12, 0.22);
-}
-.bg-pixel--d2 {
-  box-shadow:
-    0 1px 0 0 rgba(24, 19, 12, 0.45),
-    0 2px 4px rgba(24, 19, 12, 0.20);
-}
-.bg-pixel--d3 {
-  box-shadow:
-    0 2px 0 0 rgba(24, 19, 12, 0.65),
-    0 4px 7px rgba(24, 19, 12, 0.28),
-    0 7px 14px rgba(24, 19, 12, 0.16);
-}
 .cloud {
   position: absolute;
   left: var(--x);
@@ -314,21 +281,10 @@ input { font: inherit; color: inherit; }
   /* --tx may include scaleX(-1) flip + slight rotation for chaos. */
   transform: translateX(-50%) var(--tx, scale(1));
   pointer-events: none;
-  image-rendering: pixelated;       /* preserve pixel-edges of the asset */
+  image-rendering: pixelated;
   image-rendering: -webkit-optimize-contrast;
-  /* Dissolves the white background of JPEG cloud sprites into the cream
-     canvas (white * cream = cream). Transparent PNGs are unaffected. */
-  mix-blend-mode: multiply;
 }
-/* Warm-amber tint for a subset of clouds. sepia colorizes the near-
-   achromatic voxel art to brown, saturate amplifies, hue-rotate shifts
-   the result into a soft orange. */
-.cloud--orange {
-  filter: sepia(0.65) saturate(2.2) hue-rotate(-18deg);
-}
-/* Per-cloud opacity comes from inline `--o`. Voxel asset already reads as
-   a desaturated whitish block — no extra filter, so the orange pixel
-   accents stay vivid. */
+/* Per-cloud opacity comes from inline `--o`. */
 .cloud {
   opacity: var(--o, 0.55);
 }
