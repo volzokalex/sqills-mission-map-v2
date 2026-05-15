@@ -377,6 +377,21 @@ input { font: inherit; color: inherit; }
   z-index: 2;
   list-style: none;
 }
+/* Labels + progress live on the very top layer — never hidden by iso
+   cluster overlap. Inline left/top per item place each exactly. */
+.island-labels {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  list-style: none;
+}
+.island-labels .island-label,
+.island-labels .island-progress {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: auto;        /* override .island-label's calc(100% + …) */
+}
 .island-slot {
   position: absolute;
   width: var(--island-size);

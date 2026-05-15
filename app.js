@@ -390,6 +390,7 @@
 
   /* ---------- Map rendering ---------- */
   const islandsEl = document.getElementById('islands');
+  const islandLabelsEl = document.getElementById('islandLabels');
   const trailEl = document.getElementById('trail');
   const mapEl = document.getElementById('map');
   const emptyStateEl = document.getElementById('emptyState');
@@ -401,6 +402,7 @@
 
     if (count === 0) {
       islandsEl.innerHTML = '';
+      if (islandLabelsEl) islandLabelsEl.innerHTML = '';
       trailEl.innerHTML = '';
       trailEl.style.display = 'none';
       mapEl.style.minHeight = '0';
@@ -456,6 +458,7 @@
 
     // Islands
     let html = '';
+    let labelsHtml = '';
     missions.forEach((m, i) => {
       const x = islandXPct(i, count);
       const y = islandY(i);
@@ -477,24 +480,6 @@
         : `<div class="island-placeholder">${i + 1}</div>`;
 
       const slotCls = isLast ? 'island-slot island-slot--last' : 'island-slot';
-      const progressPct = Math.max(0, Math.min(100, Number(m.progress) || 0));
-      let progressHtml = '';
-      if (m.progressEnabled) {
-        if (progressPct >= 100) {
-          progressHtml =
-            `<div class="island-progress island-progress--done" aria-hidden="true">` +
-              `<svg class="island-check" viewBox="0 0 16 16">` +
-                `<path d="M3 8 L7 12 L13 4" fill="none" stroke="currentColor" ` +
-                `stroke-width="3" stroke-linecap="square" stroke-linejoin="miter"/>` +
-              `</svg>` +
-            `</div>`;
-        } else {
-          progressHtml =
-            `<div class="island-progress" aria-hidden="true">` +
-              `<div class="island-progress__fill" style="--p:${progressPct}%"></div>` +
-            `</div>`;
-        }
-      }
       html += `
         <li class="${slotCls}" style="left:${x}%; top:${y}px;">
           <button class="island state-${m.state}" type="button"
@@ -503,11 +488,39 @@
                   aria-label="${escapeHtml(m.title || 'Mission ' + (i + 1))}">
             ${visual}
             ${badge}
-            ${m.title ? `<span class="island-label">${escapeHtml(m.title)}</span>` : ''}
-            ${progressHtml}
           </button>
         </li>
       `;
+
+      // Label + progress emitted into the top-most overlay layer so they
+      // are never hidden by overlapping front-row islands in iso clusters.
+      const islandH      = isLast ? ISLAND_SIZE * LAST_SCALE : ISLAND_SIZE;
+      const labelOffset  = isLast ? 25 : 40;
+      const labelY       = y + islandH + labelOffset;
+      const progY        = labelY + 25;
+      if (m.title) {
+        labelsHtml +=
+          `<li class="island-label" style="left:${x}%; top:${labelY}px">` +
+          escapeHtml(m.title) +
+          `</li>`;
+      }
+      if (m.progressEnabled) {
+        const progressPct = Math.max(0, Math.min(100, Number(m.progress) || 0));
+        if (progressPct >= 100) {
+          labelsHtml +=
+            `<li class="island-progress island-progress--done" style="left:${x}%; top:${progY}px">` +
+              `<svg class="island-check" viewBox="0 0 16 16">` +
+                `<path d="M3 8 L7 12 L13 4" fill="none" stroke="currentColor" ` +
+                `stroke-width="3" stroke-linecap="square" stroke-linejoin="miter"/>` +
+              `</svg>` +
+            `</li>`;
+        } else {
+          labelsHtml +=
+            `<li class="island-progress" style="left:${x}%; top:${progY}px">` +
+              `<div class="island-progress__fill" style="--p:${progressPct}%"></div>` +
+            `</li>`;
+        }
+      }
 
       // Side missions for this main — placed as smaller islands offset L/R,
       // with a chaotic but deterministic scatter on both axes per side id.
@@ -575,6 +588,7 @@
       });
     });
     islandsEl.innerHTML = html;
+    if (islandLabelsEl) islandLabelsEl.innerHTML = labelsHtml;
     trailEl.innerHTML = trailHtml;
     attachIslandHandlers();
   }

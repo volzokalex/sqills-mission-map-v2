@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260515ar">
+  <link rel="stylesheet" href="styles.css?v=20260515as">
 </head>
 <body>
   <div class="identity-band" aria-hidden="true"></div>
@@ -54,6 +54,9 @@
     <div class="map" id="map">
       <div class="trail" id="trail" aria-hidden="true"></div>
       <ol class="islands" id="islands"></ol>
+      <!-- Labels + progress bars live above every island so cluster
+           overlap never hides them. -->
+      <ol class="island-labels" id="islandLabels" aria-hidden="true"></ol>
     </div>
 
     <div class="empty-state" id="emptyState" hidden>
@@ -96,7 +99,7 @@
     </div>
   </section>
 
-  <script src="sample-data.js?v=20260515ao"></script>
-  <script src="app.js?v=20260515ao"></script>
+  <script src="sample-data.js?v=20260515as"></script>
+  <script src="app.js?v=20260515as"></script>
 </body>
 </html>
