@@ -477,6 +477,10 @@
         : `<div class="island-placeholder">${i + 1}</div>`;
 
       const slotCls = isLast ? 'island-slot island-slot--last' : 'island-slot';
+      const progressPct = Math.max(0, Math.min(100, Number(m.progress) || 0));
+      const progressHtml = m.progressEnabled
+        ? `<div class="island-progress" aria-hidden="true"><div class="island-progress__fill" style="--p:${progressPct}%"></div></div>`
+        : '';
       html += `
         <li class="${slotCls}" style="left:${x}%; top:${y}px;">
           <button class="island state-${m.state}" type="button"
@@ -486,6 +490,7 @@
             ${visual}
             ${badge}
             ${m.title ? `<span class="island-label">${escapeHtml(m.title)}</span>` : ''}
+            ${progressHtml}
           </button>
         </li>
       `;
@@ -700,6 +705,16 @@
               <label>State</label>
               <select class="mission-state">${stateOptions}</select>
             </div>
+            <div class="mission-fields__row">
+              <label class="mission-progress-toggle">
+                <input type="checkbox" class="mission-progress-enable" ${m.progressEnabled ? 'checked' : ''}>
+                <span>Progress</span>
+              </label>
+              <input type="number" class="mission-progress-value" min="0" max="100"
+                     value="${Math.max(0, Math.min(100, Number(m.progress) || 0))}"
+                     ${m.progressEnabled ? '' : 'disabled'}>
+              <span class="lessons-sep">%</span>
+            </div>
             <div class="mission-sides" data-parent="${m.id}">
               ${sidesHtml}
               <button class="mission-add-side" type="button" data-parent="${m.id}">+ Add side mission</button>
@@ -727,6 +742,8 @@
       const delEl = row.querySelector('.mission-delete');
       const mainThumbEl = row.querySelector('.mission-thumb--main');
       const doneThumbEl = row.querySelector('.mission-thumb--done');
+      const progEnableEl = row.querySelector('.mission-progress-enable');
+      const progValueEl  = row.querySelector('.mission-progress-value');
 
       const openPicker = (target) => {
         const inp = document.createElement('input');
@@ -774,6 +791,35 @@
         m.state = stateEl.value;
         persist();
         renderEditor();
+        renderMap();
+        renderHeader();
+      });
+      progEnableEl?.addEventListener('change', () => {
+        const m = missions.find(x => x.id === id);
+        if (!m) return;
+        m.progressEnabled = progEnableEl.checked;
+        if (m.progressEnabled && (m.progress === undefined || m.progress === null)) m.progress = 0;
+        persist();
+        renderEditor();
+        renderMap();
+      });
+      progValueEl?.addEventListener('input', () => {
+        const m = missions.find(x => x.id === id);
+        if (!m) return;
+        let v = Number(progValueEl.value);
+        if (!Number.isFinite(v)) v = 0;
+        v = Math.max(0, Math.min(100, Math.round(v)));
+        m.progress = v;
+        // 100% → flip the mission state to done (demoting current if needed).
+        if (v === 100 && m.state !== 'done') {
+          m.state = 'done';
+          persist();
+          renderEditor();
+          renderMap();
+          renderHeader();
+          return;
+        }
+        persist();
         renderMap();
         renderHeader();
       });

@@ -579,6 +579,32 @@ input { font: inherit; color: inherit; }
   top: calc(100% + 25px);
 }
 
+/* Progress bar under the label — fixed width, fills with amber gradient. */
+.island-progress {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 65px);
+  transform: translateX(-50%);
+  width: 90px;
+  height: 4px;
+  background: rgba(255, 247, 230, 0.22);
+  border-radius: 999px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.island-slot--last .island-progress {
+  top: calc(100% + 50px);
+}
+.island-progress__fill {
+  height: 100%;
+  width: var(--p, 0%);
+  background: linear-gradient(90deg,
+    var(--amber-light) 0%, var(--amber-mid) 50%, var(--amber-deep) 100%);
+  border-radius: 999px;
+  box-shadow: 0 0 6px rgba(255, 122, 26, 0.45);
+  transition: width 260ms cubic-bezier(.2, .7, .2, 1);
+}
+
 /* Empty state */
 .empty-state {
   position: relative;
@@ -609,6 +635,11 @@ input { font: inherit; color: inherit; }
 }
 
 /* ---------- Editor tab ---------- */
+/* Always uses the light cream palette regardless of map's canvas. */
+.tab-panel--editor {
+  --canvas: #FAF8F3;
+  background: var(--canvas);
+}
 .editor {
   padding: 20px var(--pad-x) 80px;
   display: flex;
@@ -771,6 +802,32 @@ input { font: inherit; color: inherit; }
 .mission-fields__row .lessons-sep {
   color: var(--text-tertiary);
   font-weight: 600;
+}
+.mission-progress-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.mission-progress-toggle input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--primary-500);
+  cursor: pointer;
+}
+.mission-progress-value {
+  width: 56px;
+  text-align: center;
+}
+.mission-progress-value:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .mission-delete {
